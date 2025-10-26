@@ -1,0 +1,6 @@
+[submodule "lib/sdl"]
+	path = lib/sdl
+	url = https://github.com/libsdl-org/SDL.git
+[submodule "lib/glm"]
+	path = lib/glm
+	url = https://github.com/icaven/glm.git
