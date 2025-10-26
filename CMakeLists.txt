@@ -1,0 +1,32 @@
+cmake_minimum_required(VERSION 4.0)
+project(Iron VERSION 0.1.0 LANGUAGES CXX DESCRIPTION "Open source and easy to use 3D game engine.")
+set(CXX_STANDARD 17)
+set(CXX_STANDARD_REQUIRED ON)
+
+set(IronDir ${Iron_SOURCE_DIR})
+set(IronSrcDir ${IronDir}/src)
+set(IronEngineDir ${IronSrcDir}/engine)
+set(IronToolsDir ${IronSrcDir}/tools)
+set(IronGameDir ${IronSrcDir}/game)
+
+option(BuildTools "Should we build the engine development tools?" ON)
+option(BuildGame "Should we build the example game?" ON)
+option(UseVulkan "Should we build the vulkan renderer?" ON)
+option(UseSystemSDL3 "Should we use the SDL3 on the user's system?" OFF)
+option(UseSystemGLM "Should we use the GLM on the user's system?" OFF)
+
+if(UseVulkan)
+	find_package(Vulkan REQUIRED)
+endif()
+
+if(UseSystemSDL3)
+	find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3-shared)
+else()
+	if(EXISTS lib/SDL)
+		add_subdirectory(lib/SDL EXCLUDE_FROM_ALL)
+	else()
+	message(FATAL_ERROR "Could not find SDL Git submodule. You must run 'git submodule update --init --recursive' to install the submodules, then rerun CMake.")
+	endif()
+endif()
+
+add_subdirectory("src")
