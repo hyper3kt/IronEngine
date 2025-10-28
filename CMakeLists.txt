@@ -39,7 +39,7 @@ else()
 	endif()
 endif()
 
-find_package(Boost REQUIRED CONFIG)
+find_package(Boost REQUIRED COMPONENTS log)
 
 file(GLOB_RECURSE IRON_SOURCES src/*.cpp)
 add_executable(IronExampleMain ${IRON_SOURCES})
