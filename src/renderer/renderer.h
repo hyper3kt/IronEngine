@@ -1,0 +1,3 @@
+namespace Iron {
+    class IRenderer;
+}
