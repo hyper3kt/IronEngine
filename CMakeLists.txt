@@ -41,8 +41,10 @@ endif()
 
 find_package(Boost REQUIRED COMPONENTS log)
 
-file(GLOB_RECURSE IRON_SOURCES src/*.cpp)
-add_executable(IronExampleMain ${IRON_SOURCES})
+file(GLOB_RECURSE IRON_SOURCE src/*.cpp)
+file(GLOB_RECURSE IRON_HEADERS src/*.h)
 
-target_include_directories(IronExampleMain PRIVATE ${Boost_INCLUDE_DIRS})
-target_link_libraries(IronExampleMain PRIVATE Boost::boost Boost::log)
+add_executable(IronTest ${IRON_SOURCE} ${IRON_HEADERS})
+
+target_include_directories(IronTest PRIVATE ${IRON_HEADERS} ${Boost_INCLUDE_DIRS} ${SDL3_INCLUDE_DIRS})
+target_link_libraries(IronTest PRIVATE Boost::boost Boost::log SDL3::SDL3)
