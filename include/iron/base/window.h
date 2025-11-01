@@ -10,7 +10,6 @@ namespace Iron {
 
         public:
         Window();
-        ~Window();
         
         static bool InitSystem();
         static void KillSystem();

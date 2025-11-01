@@ -1,11 +1,11 @@
 #pragma once
 
-#include "window.h"
-
 #include <iostream>
 #include <vector>
 
 namespace Iron {
+
+	class Window;
 
 	class Engine {
 

@@ -1,5 +1,5 @@
-#include "engine.h"
-#include "window.h"
+#include "iron/base/engine.h"
+#include "iron/base/window.h"
 
 #include <SDL3/SDL.h>
 
@@ -14,7 +14,7 @@ void Window::PollEvents() {
     
 }
 
-Window::~Window() {
+void Window::Kill() {
     SDL_DestroyWindow(window);
 }
 
