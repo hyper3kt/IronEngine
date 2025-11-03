@@ -28,16 +28,19 @@ namespace Iron {
 
             inline ConfigEntryData() {}
             inline ~ConfigEntryData() {}
+
+            inline ConfigEntryData(ConfigEntryData& other) {
+                *this = other;
+            }
+
+            inline ConfigEntryData operator=(ConfigEntryData& other) {
+                return other;
+            }
         };
 
         union ConfigEntryData data;
         ConfigEntryType type;
         std::string name;
-
-        // All of this bullshit is included because otherwise C++ complains about deleted ctors.
-        // Why are these ctors deleted, Stroustrup? Why does defaulting a ctor/operator make it
-        // delete the goddamn function? In what world does that make sense? How are you able to
-        // make default code that works EXCEPT for structs? This shit is fucking retarded. -K
 
         inline ConfigEntry() {}
         inline ConfigEntry(std::string data, ConfigEntryType type, std::string name) {
@@ -58,17 +61,24 @@ namespace Iron {
             } else return ConfigEntry(other.data.list, IRON_ENTRY_STRING_LIST, other.name);
         }
 
+        inline ConfigEntry(ConfigEntry& other) {
+            this->data = other.data;
+            this->name = other.name;
+            this->type = other.type;
+        }
+
     };
 
     class Config {
 
         boost::unordered_map<std::string, ConfigEntry> map;
         ConfigFailureReason result;
+        std::string path;
 
         public:
         Config(std::string path);
 
-        ConfigFailureReason GetParseResult();
+        ConfigFailureReason GetLoadResult();
         Result<ConfigEntry> GetEntry(std::string name);
 
     };

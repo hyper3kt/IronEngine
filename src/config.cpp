@@ -244,6 +244,7 @@ boost::unordered_map<std::string, ConfigEntry> CompileTree(CTParserTree tree) {
 }
 
 Config::Config(std::string path) {
+	this->path = path;
 	boost::filesystem::path configPath(path);
 
 	if(!boost::filesystem::exists(configPath)) {
@@ -274,4 +275,16 @@ Config::Config(std::string path) {
 	}
 
 	map = CompileTree(tree.GetValue());
+}
+
+ConfigFailureReason Config::GetLoadResult() {
+	return result;
+}
+
+Result<ConfigEntry> Config::GetEntry(std::string name) {
+	if(!map.contains(name)) {
+		return Result<ConfigEntry>(Failure("Entry " + name + " doesn't exist in file: " + path, 0));
+	}
+
+	return Result<ConfigEntry>(map[name]);
 }
