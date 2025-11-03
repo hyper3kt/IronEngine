@@ -39,14 +39,21 @@ else()
 	endif()
 endif()
 
-find_package(Boost REQUIRED COMPONENTS log)
+find_package(Boost REQUIRED COMPONENTS log unordered variant filesystem)
 
 file(GLOB_RECURSE IRON_SOURCE ${IRON_DIR}/src/*.cpp)
-file(GLOB_RECURSE IRON_HEADERS ${IRON_DIR}/src/*.h)
+file(GLOB_RECURSE IRON_HEADERS ${IRON_DIR}/src/*.hpp)
 set(IRON_INCLUDE ${IRON_DIR}/include/)
 
 add_library(IronEngine STATIC ${IRON_SOURCE} ${IRON_HEADERS})
 
 target_include_directories(IronEngine PUBLIC ${IRON_INCLUDE})
 target_include_directories(IronEngine PRIVATE  ${IRON_HEADERS} ${Boost_INCLUDE_DIRS} ${SDL3_INCLUDE_DIRS})
-target_link_libraries(IronEngine PUBLIC Boost::boost Boost::log SDL3::SDL3)
+target_link_libraries(IronEngine PRIVATE 
+	Boost::boost 
+	Boost::log 
+	Boost::unordered 
+	Boost::variant 
+	Boost::filesystem 
+	SDL3::SDL3
+)

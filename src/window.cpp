@@ -1,5 +1,5 @@
-#include "iron/base/engine.h"
-#include "iron/base/window.h"
+#include "iron/base/engine.hpp"
+#include "iron/base/window.hpp"
 
 #include <SDL3/SDL.h>
 
