@@ -14,8 +14,8 @@ namespace Iron {
         Failure(unsigned int failureCode);
         Failure(std::string failureReason, unsigned int failureCode);
 
-        std::string getFailureReason();
-        unsigned int getFailureCode();
+        std::string GetFailureReason();
+        unsigned int GetFailureCode();
 
     };
 
@@ -32,6 +32,7 @@ namespace Iron {
 
         bool Success();
         Ok GetValue();
+        Failure GetFailure();
 
     };
     

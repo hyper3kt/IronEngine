@@ -5,8 +5,6 @@
 
 #include <string>
 
-// https://wiki.libsdl.org/SDL3/SDL_SetAppMetadata
-
 using namespace Iron;
 
 enum ConfigTokenType {
@@ -41,6 +39,7 @@ std::vector<ConfigToken> LexString(std::string line, int lineNumber) {
 		char currentChar = line.at(i);
 
 		if(currentChar == '#' && !stringConsumer) {
+			tokens.push_back(token);
 			return tokens;
 		}
 
@@ -49,8 +48,9 @@ std::vector<ConfigToken> LexString(std::string line, int lineNumber) {
 				stringConsumer = false;
 				tokens.push_back(token);
 				token = ConfigToken(i, lineNumber);
-				continue;
 			} else token.data += currentChar;
+
+			continue;
 		}
 
 		if(currentChar == '"') {
@@ -86,18 +86,18 @@ std::vector<ConfigToken> LexString(std::string line, int lineNumber) {
 	return tokens;
 }
 
-enum CTTreeType {
+enum CTNodeType {
 	TREE_ORIGIN,
 	TREE_DEFINITION,
 	TREE_ITEM,
 };
 
-struct CTParserTree {
-	CTTreeType type;
+struct CTParserNode {
+	CTNodeType type;
 	std::string data;
-	std::vector<CTParserTree> children;
+	std::vector<CTParserNode> children;
 
-	CTParserTree(CTTreeType type, std::string data) {
+	CTParserNode(CTNodeType type, std::string data) {
 		this->type = type;
 		this->data = data;
 	}
@@ -112,8 +112,14 @@ enum CTParserFailure {
 class CTParser {
 
 	std::vector<ConfigToken> tokens;
-	CTParserTree origin = CTParserTree(TREE_ORIGIN, "Origin");
+	CTParserNode origin = CTParserNode(TREE_ORIGIN, "Origin");
 	int numTokensConsumed = 0;
+
+	std::string RepresentTokenPosition(ConfigToken token) {
+		std::string expected = "line " + token.onLine;
+		expected += " at column " + token.atColumn;
+		return expected;
+	}
 
 	ConfigToken ConsumeToken() {
 		ConfigToken token = tokens.at(numTokensConsumed);
@@ -139,7 +145,7 @@ class CTParser {
 
 		if(name.type == TOK_TEXT && colon.type == TOK_COLON) {
 			return Result<ConfigToken>(name);
-		} else return Result<ConfigToken>(Failure(PARSER_EXPECTED_DEFINITION));
+		} else return Result<ConfigToken>(Failure("Expected definition on " + RepresentTokenPosition(name), PARSER_EXPECTED_DEFINITION));
 	}
 
 	bool ExpectListItem() {
@@ -166,7 +172,7 @@ class CTParser {
 			ConfigToken token = ConsumeToken();
 
 			if(!IsTextual(token.type)) {
-				return Result<std::vector<ConfigToken>>(Failure(PARSER_EXPECTED_LIST_ITEM));
+				return Result<std::vector<ConfigToken>>(Failure("Expected list item char (>) on " + RepresentTokenPosition(token), PARSER_EXPECTED_LIST_ITEM));
 			}
 
 			tokens.push_back(token);
@@ -183,48 +189,53 @@ class CTParser {
 		this->tokens = tokens;
 	}
 
-	Result<CTParserTree> ParseTokens() {
+	Result<CTParserNode> ParseTokens() {
 		while(numTokensConsumed < tokens.size()) {
 			Result<ConfigToken> tokenResult = ExpectDefinition();
 
 			if(!tokenResult.Success()) {
-				return Result<CTParserTree>(Failure(PARSER_FAILED));
+				return Result<CTParserNode>(tokenResult.GetFailure());
 			}
 
-			CTParserTree definition = CTParserTree(TREE_DEFINITION, tokenResult.GetValue().data);
+			CTParserNode definition = CTParserNode(TREE_DEFINITION, tokenResult.GetValue().data);
 
 			ConfigToken token = PeekToken();
 
 			if(IsTextual(token.type)) {
 				ConsumeToken();
-				definition.children.push_back(CTParserTree(TREE_ITEM, token.data));
+				definition.children.push_back(CTParserNode(TREE_ITEM, token.data));
 				origin.children.push_back(definition);
 				continue;
-			} else if(token.type != TOK_LIST_ITEM) return Result<CTParserTree>(Failure(PARSER_EXPECTED_LIST_ITEM));
+			} else if(token.type != TOK_LIST_ITEM) return Result<CTParserNode>(
+					Failure(
+						"Expected list item char (>) on " + RepresentTokenPosition(token), 
+						PARSER_EXPECTED_LIST_ITEM
+					)
+				);
 
 			Result<std::vector<ConfigToken>> listResult = ExpectList();
 
 			if(!listResult.Success()) {
-				return Result<CTParserTree>(Failure(PARSER_FAILED));
+				return Result<CTParserNode>(listResult.GetFailure());
 			}
 
 			std::vector<ConfigToken> list = listResult.GetValue();
 
 			for(int i = 0; i < list.size(); i++) {
-				definition.children.push_back(CTParserTree(TREE_ITEM, list.at(i).data));
+				definition.children.push_back(CTParserNode(TREE_ITEM, list.at(i).data));
 			}
 		}
 
-		return Result<CTParserTree>(origin);
+		return Result<CTParserNode>(origin);
 	}
 };
 
-boost::unordered_map<std::string, ConfigEntry> CompileTree(CTParserTree tree) {
+boost::unordered_map<std::string, ConfigEntry> CompileTree(CTParserNode tree) {
 	boost::unordered_map<std::string, ConfigEntry> map;
 
 	for(int i = 0; i < tree.children.size(); i++) {
-		CTParserTree definition = tree.children.at(i);
-		std::vector<CTParserTree> items = definition.children;
+		CTParserNode definition = tree.children.at(i);
+		std::vector<CTParserNode> items = definition.children;
 
 		if(items.size() == 1) {
 			map[definition.data] = ConfigEntry(items.at(0).data, IRON_ENTRY_STRING, definition.data);
@@ -245,11 +256,13 @@ boost::unordered_map<std::string, ConfigEntry> CompileTree(CTParserTree tree) {
 
 Config::Config(std::string path) {
 	this->path = path;
+}
+
+Result<ConfigLoadStatus> Config::Load() {
 	boost::filesystem::path configPath(path);
 
 	if(!boost::filesystem::exists(configPath)) {
-		result = IRON_CONFIG_FILE_NOT_FOUND;
-		return;
+		return Result<ConfigLoadStatus>(Failure("The path: " + path + " was not found on the system", IRON_CONFIG_FILE_NOT_FOUND));
 	}
 
 	boost::filesystem::ifstream config(configPath);
@@ -267,24 +280,25 @@ Config::Config(std::string path) {
 
 	CTParser parser = CTParser(tokenList);
 
-	Result<CTParserTree> tree = parser.ParseTokens();
-	
+	Result<CTParserNode> tree = parser.ParseTokens();
+
 	if(!tree.Success()) {
-		result = IRON_CONFIG_PARSER_FAILED;
-		return;
+		return Result<ConfigLoadStatus>(Failure(tree.GetFailure().GetFailureReason(), IRON_CONFIG_PARSER_FAILED));
 	}
 
 	map = CompileTree(tree.GetValue());
-}
 
-ConfigFailureReason Config::GetLoadResult() {
-	return result;
+	return Result<ConfigLoadStatus>(IRON_CONFIG_OKAY);
 }
 
 Result<ConfigEntry> Config::GetEntry(std::string name) {
-	if(!map.contains(name)) {
-		return Result<ConfigEntry>(Failure("Entry " + name + " doesn't exist in file: " + path, 0));
+	if(!HasEntry(name)) {
+		return Result<ConfigEntry>(Failure("Entry " + name + " doesn't exist in config file: " + path, 0));
 	}
 
 	return Result<ConfigEntry>(map[name]);
+}
+
+bool Config::HasEntry(std::string name) {
+	return map.contains(name);
 }

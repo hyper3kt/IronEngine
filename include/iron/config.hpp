@@ -13,8 +13,7 @@ namespace Iron {
         IRON_ENTRY_STRING_LIST,
     };
 
-    enum ConfigFailureReason {
-        IRON_CONFIG_WRONG_GET,
+    enum ConfigLoadStatus {
         IRON_CONFIG_FILE_NOT_FOUND,
         IRON_CONFIG_PARSER_FAILED,
         IRON_CONFIG_OKAY,
@@ -72,14 +71,15 @@ namespace Iron {
     class Config {
 
         boost::unordered_map<std::string, ConfigEntry> map;
-        ConfigFailureReason result;
+        ConfigLoadStatus result;
         std::string path;
 
         public:
         Config(std::string path);
 
-        ConfigFailureReason GetLoadResult();
+        Result<ConfigLoadStatus> Load();
         Result<ConfigEntry> GetEntry(std::string name);
+        bool HasEntry(std::string name);
 
     };
 

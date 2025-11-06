@@ -6,15 +6,17 @@
 namespace Iron {
 
 	class Window;
+	class Config;
 
 	class Engine {
 
 		static std::vector<Window> windows;
 		static std::string gameName;
+		static Config config;
 		static bool shouldKill;
 
 		public:
-		static void Init(std::string gameName);
+		static void Init(std::string gameConfig);
 		static void Kill();
 
 		static void SetGameName(std::string name);
