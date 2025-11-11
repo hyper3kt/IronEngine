@@ -7,7 +7,7 @@ set(IRON_DIR ${Iron_SOURCE_DIR})
 set(IRON_SRC_DIR ${IRON_DIR}/src)
 set(IRON_EXAMPLES_DIR ${IRON_DIR}/examples)
 
-option(USE_VULKAN "Should we build the vulkan renderer?" ON)
+option(USE_VULKAN "Should we build the Vulkan renderer?" ON)
 
 option(BUILD_EXAMPLES "Should we build the engine examples?" ON)
 
