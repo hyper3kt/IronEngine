@@ -258,11 +258,11 @@ Config::Config(std::string path) {
 	this->path = path;
 }
 
-Result<ConfigLoadStatus> Config::Load() {
+Result<ConfigStatus> Config::Load() {
 	boost::filesystem::path configPath(path);
 
 	if(!boost::filesystem::exists(configPath)) {
-		return Result<ConfigLoadStatus>(Failure("The path: " + path + " was not found on the system", IRON_CONFIG_FILE_NOT_FOUND));
+		return Result<ConfigStatus>(Failure("The path: " + path + " was not found on the system", IRON_CONFIG_NONEXISTENT_FILE));
 	}
 
 	boost::filesystem::ifstream config(configPath);
@@ -283,22 +283,124 @@ Result<ConfigLoadStatus> Config::Load() {
 	Result<CTParserNode> tree = parser.ParseTokens();
 
 	if(!tree.Success()) {
-		return Result<ConfigLoadStatus>(Failure(tree.GetFailure().GetFailureReason(), IRON_CONFIG_PARSER_FAILED));
+		return Result<ConfigStatus>(Failure(tree.GetFailure().GetFailureReason(), IRON_CONFIG_PARSER_FAILED));
 	}
 
 	map = CompileTree(tree.GetValue());
 
-	return Result<ConfigLoadStatus>(IRON_CONFIG_OKAY);
+	return Result<ConfigStatus>(IRON_CONFIG_OKAY);
 }
 
 Result<ConfigEntry> Config::GetEntry(std::string name) {
 	if(!HasEntry(name)) {
-		return Result<ConfigEntry>(Failure("Entry " + name + " doesn't exist in config file: " + path, 0));
+		return Result<ConfigEntry>(Failure("Entry " + name + " doesn't exist for config file: " + path, IRON_CONFIG_NONEXISTENT_ENTRY));
+	}
+
+	if(!HasEntryInFile(name)) {
+		return Result<ConfigEntry>(changes[name]);
 	}
 
 	return Result<ConfigEntry>(map[name]);
 }
 
 bool Config::HasEntry(std::string name) {
+	if(map.contains(name)) {
+		return true;
+	}
+
+	if(changes.contains(name)) {
+		return changes.at(name).type != IRON_ENTRY_DELETE;
+	}
+
+	return false;
+}
+
+bool Config::HasEntryInFile(std::string name) {
 	return map.contains(name);
+}
+
+Config Config::CreateEmpty(std::string name) {
+	std::ofstream path(name);
+	path.close();
+
+	Config config = Config(name);
+	config.Load();
+
+	return config;
+}
+
+Config Config::CreateDefaultSettings() {
+	Config settings = CreateEmpty("./settings.ic");
+
+	// TODO
+
+	return settings;
+}
+
+void Config::SetEntry(std::string name, std::string value) {
+	changes[name] = ConfigEntry(value, IRON_ENTRY_STRING, name);
+}
+
+void Config::SetEntry(std::string name, std::vector<std::string> value) {
+	changes[name] = ConfigEntry(value, IRON_ENTRY_STRING_LIST, name);
+}
+
+void Config::RemoveEntry(std::string name) {
+	changes[name] = ConfigEntry("", IRON_ENTRY_DELETE, "");
+}
+
+bool StartsWithIllegalChar(std::string value) {
+	char c = value.at(0);
+	return c == '#' || c == ':' || c == '>';
+}
+
+// Roight propuh, innit?
+std::string ProperWrappedEntry(std::string value) {
+	if(StartsWithIllegalChar(value)) {
+		return "\"" + value + "\"";
+	}
+
+	return value;
+}
+
+Result<ConfigStatus> Config::SaveChanges() {
+	boost::filesystem::remove(path);
+
+	boost::unordered_map<std::string, ConfigEntry>::iterator it;
+
+	for(it = changes.begin(); it != changes.end(); it++) {
+		map[it->first] = it->second;
+	}
+	
+	boost::filesystem::ofstream config(path);
+
+	if(!config.is_open()) {
+		return Result<ConfigStatus>(Failure(IRON_CONFIG_SAVE_FAILED));
+	}
+
+	for(it = map.begin(); it != map.end(); it++) {
+		if(it->second.type == IRON_ENTRY_DELETE) {
+			continue;
+		}
+
+		config << it->first << ": ";
+
+		ConfigEntry::ConfigEntryData data = it->second.data;
+
+		switch(it->second.type) {
+			case IRON_ENTRY_STRING:
+			config << ProperWrappedEntry(data.string) << std::endl;
+			break;
+			case IRON_ENTRY_STRING_LIST:
+			config << std::endl;
+
+			for(int i = 0; i < data.list.size(); i++) {
+				config << "> " << ProperWrappedEntry(data.list.at(i)) << std::endl;
+			}
+		}
+	}
+
+	config.close();
+
+	return Result<ConfigStatus>(IRON_CONFIG_OKAY);
 }

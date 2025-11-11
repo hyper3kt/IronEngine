@@ -24,8 +24,7 @@ endif()
 if(EXISTS "${IRON_DIR}/lib/glm/CMakeLists.txt")
 	add_subdirectory("${IRON_DIR}/lib/glm" EXCLUDE_FROM_ALL)
 else()
-	message(FATAL_ERROR "Could not find GLM Git submodule. You must run 'git submodule update --init --recursive'
-	to install the submodules, then rerun CMake.")
+	message(FATAL_ERROR "Could not find GLM Git submodule. You must run 'git submodule update --init --recursive' to install the submodules, then rerun CMake.")
 endif()
 
 find_package(Boost REQUIRED COMPONENTS log unordered variant filesystem)
@@ -36,8 +35,11 @@ set(IRON_INCLUDE ${IRON_DIR}/include/)
 
 add_library(IronEngine STATIC ${IRON_SOURCE} ${IRON_PRIVATE_HEADERS})
 
+configure_file(${IRON_DIR}/input/project_vars.h.in ${CMAKE_CURRENT_BINARY_DIR}/input/project_vars.h)
+
 target_include_directories(IronEngine PUBLIC ${IRON_INCLUDE})
 target_include_directories(IronEngine PRIVATE  ${IRON_PRIVATE_HEADERS} ${Boost_INCLUDE_DIRS} ${SDL3_INCLUDE_DIRS})
+target_include_directories(IronEngine PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/input/)
 target_link_libraries(IronEngine PRIVATE 
 	Boost::boost 
 	Boost::log 

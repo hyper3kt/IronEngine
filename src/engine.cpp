@@ -10,15 +10,20 @@ bool Engine::shouldKill = false;
 
 #define GetStrFromEntry(str) config.GetEntry(str).GetValue().data.string;
 
-void Engine::Init(std::string gameConfig) {
-    //SetGameName(gameName);
-
+void Engine::Init(std::string gameConfig, std::string settingsPath) {
     config = Config(gameConfig);
-    Result<ConfigLoadStatus> loadResult = config.Load();
+    Result<ConfigStatus> loadResult = config.Load();
 
     if(!loadResult.Success()) {
         Kill();
         return;
+    }
+
+    settings = Config(settingsPath);
+    loadResult = settings.Load();
+
+    if(!loadResult.Success()) {
+        settings = Config::CreateDefaultSettings();
     }
     
     Window::InitSystem();
@@ -27,6 +32,7 @@ void Engine::Init(std::string gameConfig) {
 
     if(config.HasEntry("name")) {
         std::string entry = GetStrFromEntry("name");
+
         wsm.name = entry;
         gameName = entry;
     }

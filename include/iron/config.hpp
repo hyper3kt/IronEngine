@@ -11,11 +11,14 @@ namespace Iron {
     enum ConfigEntryType {
         IRON_ENTRY_STRING,
         IRON_ENTRY_STRING_LIST,
+        IRON_ENTRY_DELETE,
     };
 
-    enum ConfigLoadStatus {
-        IRON_CONFIG_FILE_NOT_FOUND,
+    enum ConfigStatus {
+        IRON_CONFIG_NONEXISTENT_FILE,
+        IRON_CONFIG_NONEXISTENT_ENTRY,        
         IRON_CONFIG_PARSER_FAILED,
+        IRON_CONFIG_SAVE_FAILED,
         IRON_CONFIG_OKAY,
     };
 
@@ -71,16 +74,22 @@ namespace Iron {
     class Config {
 
         boost::unordered_map<std::string, ConfigEntry> map;
-        ConfigLoadStatus result;
+        boost::unordered_map<std::string, ConfigEntry> changes;
         std::string path;
 
         public:
         Config(std::string path);
+        static Config CreateEmpty(std::string name);
+        static Config CreateDefaultSettings();
 
-        Result<ConfigLoadStatus> Load();
+        Result<ConfigStatus> Load();
         Result<ConfigEntry> GetEntry(std::string name);
+        void SetEntry(std::string name, std::string value);
+        void SetEntry(std::string name, std::vector<std::string> value);
+        void RemoveEntry(std::string name);
         bool HasEntry(std::string name);
-
+        bool HasEntryInFile(std::string name);
+        Result<ConfigStatus> SaveChanges();
     };
 
 }

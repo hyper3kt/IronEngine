@@ -13,10 +13,11 @@ namespace Iron {
 		static std::vector<Window> windows;
 		static std::string gameName;
 		static Config config;
+		static Config settings;
 		static bool shouldKill;
 
 		public:
-		static void Init(std::string gameConfig);
+		static void Init(std::string gameConfig, std::string settingsPath);
 		static void Kill();
 
 		static void SetGameName(std::string name);
