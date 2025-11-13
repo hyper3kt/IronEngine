@@ -20,9 +20,12 @@ namespace Iron {
         SDL_Window* window;
 
         public:
-        Window();
+        Window(int width, int height);
+        Window(int width, int height, std::string name);
         
         static bool InitSystem();
+        static bool AttemptLoadVulkan();
+        static bool AttemptLoadOpenGL();
         static void KillSystem();
         static void SetWindowMetadata(WindowSystemMetadata wsm);
         static WindowSystemMetadata GetWindowMetadata();

@@ -2,13 +2,15 @@
 #include "iron/base/window.hpp"
 
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_vulkan.h>
 
 using namespace Iron;
 
 WindowSystemMetadata Window::wsm = WindowSystemMetadata();
 
-Window::Window() {
-    window = SDL_CreateWindow(Engine::GetGameName().c_str(), 640, 480, SDL_WINDOW_OPENGL);
+Window::Window(int width, int height, std::string name) {
+    auto rendererChoice = Engine::ShouldUseVulkan() ? SDL_WINDOW_VULKAN : SDL_WINDOW_OPENGL;
+    window = SDL_CreateWindow(name.c_str(), width, height, rendererChoice);
     if(!window) return; // TODO: impl bug reports
 }
 
@@ -24,7 +26,19 @@ bool Window::InitSystem() {
     return SDL_Init(SDL_INIT_VIDEO);
 }
 
+bool Window::AttemptLoadVulkan() {
+    return SDL_Vulkan_LoadLibrary(NULL);
+}
+
+bool Window::AttemptLoadOpenGL() {
+    return SDL_GL_LoadLibrary(NULL);
+}
+
 void Window::KillSystem() {
+    if(Engine::ShouldUseVulkan()) {
+        SDL_Vulkan_UnloadLibrary();
+    } else SDL_GL_UnloadLibrary();
+
     SDL_Quit();
 }
 

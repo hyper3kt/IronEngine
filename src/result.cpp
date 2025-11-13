@@ -1,5 +1,7 @@
 #include "iron/result.hpp"
 
+#include <boost/log/trivial.hpp>
+
 using namespace Iron;
 
 Failure::Failure(unsigned int failureCode) {
@@ -28,6 +30,9 @@ Result<Ok>::Result(Ok success) {
 template<typename Ok>
 Result<Ok>::Result(Failure failure) {
     this->failure = &failure;
+    if(failure.GetFailureReason() != "") {
+        BOOST_LOG_TRIVIAL(error) << failure.GetFailureReason();
+    }
 }
 
 template<typename Ok>
