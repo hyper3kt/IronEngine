@@ -20,6 +20,8 @@ namespace Iron {
 		static bool shouldKill;
 		static bool useVulkan;
 
+		Engine();
+
 		public:
 		static void Init(std::string gameConfig, std::string settingsPath);
 		static void Kill();
