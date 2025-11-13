@@ -5,7 +5,7 @@ set(CXX_STANDARD_REQUIRED ON)
 
 set(IRON_DIR ${Iron_SOURCE_DIR})
 set(IRON_SRC_DIR ${IRON_DIR}/src)
-set(IRON_EXAMPLES_DIR ${IRON_DIR}/examples)
+set(IRON_LIB_DIR ${IRON_DIR}/lib)
 
 option(USE_VULKAN "Should we build the Vulkan renderer?" ON)
 
@@ -15,14 +15,14 @@ if(USE_VULKAN)
 	find_package(Vulkan REQUIRED)
 endif()
 
-if(EXISTS "${IRON_DIR}/lib/sdl/CMakeLists.txt")
-	add_subdirectory("${IRON_DIR}/lib/sdl" EXCLUDE_FROM_ALL)
+if(EXISTS "${IRON_LIB_DIR}/sdl/CMakeLists.txt")
+	add_subdirectory("${IRON_LIB_DIR}/sdl" EXCLUDE_FROM_ALL)
 else()
 	message(FATAL_ERROR "Could not find SDL Git submodule. You must run 'git submodule update --init --recursive' to install the submodules, then rerun CMake.")
 endif()
 
-if(EXISTS "${IRON_DIR}/lib/glm/CMakeLists.txt")
-	add_subdirectory("${IRON_DIR}/lib/glm" EXCLUDE_FROM_ALL)
+if(EXISTS "${IRON_LIB_DIR}/glm/CMakeLists.txt")
+	add_subdirectory("${IRON_LIB_DIR}/glm" EXCLUDE_FROM_ALL)
 else()
 	message(FATAL_ERROR "Could not find GLM Git submodule. You must run 'git submodule update --init --recursive' to install the submodules, then rerun CMake.")
 endif()
@@ -36,7 +36,14 @@ set(IRON_INCLUDE ${IRON_DIR}/include/)
 add_library(IronEngine STATIC ${IRON_SOURCE} ${IRON_PRIVATE_HEADERS})
 
 target_include_directories(IronEngine PUBLIC ${IRON_INCLUDE})
-target_include_directories(IronEngine PRIVATE  ${IRON_PRIVATE_HEADERS} ${Boost_INCLUDE_DIRS} ${SDL3_INCLUDE_DIRS})
+target_include_directories(IronEngine PRIVATE 
+	${IRON_PRIVATE_HEADERS}
+	${Boost_INCLUDE_DIRS}
+	${SDL3_INCLUDE_DIRS}
+	${Vulkan_INCLUDE_DIRS}
+	${IRON_LIB_DIR}/glad/include
+)
+target_sources(IronEngine PRIVATE ${IRON_LIB_DIR}/glad/src)
 target_link_libraries(IronEngine PRIVATE 
 	Boost::boost 
 	Boost::log 
@@ -44,4 +51,5 @@ target_link_libraries(IronEngine PRIVATE
 	Boost::variant 
 	Boost::filesystem 
 	SDL3::SDL3
+	Vulkan::Vulkan
 )
