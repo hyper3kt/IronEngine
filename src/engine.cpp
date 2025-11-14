@@ -4,7 +4,7 @@
 #include "renderer/vulkan/vulkan_renderer.hpp"
 #include "renderer/opengl/opengl_renderer.hpp"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 using namespace Iron;
 
