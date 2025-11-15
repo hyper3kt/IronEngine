@@ -47,15 +47,15 @@ target_include_directories(IronEngine PRIVATE
     ${IRON_PRIVATE_HEADERS}
     ${Boost_INCLUDE_DIRS}
     ${SDL3_INCLUDE_DIRS}
-    ${IRON_LIB_DIR}/glad/include
 )
-target_sources(IronEngine PRIVATE ${IRON_LIB_DIR}/glad/src)
 target_link_libraries(IronEngine PRIVATE 
     Boost::boost
     SDL3::SDL3
 )
-
 if (USE_VULKAN)
     target_include_directories(IronEngine PRIVATE ${Vulkan_INCLUDE_DIRS})
     target_link_libraries(IronEngine PRIVATE Vulkan::Vulkan)
+else()
+	target_include_directories(IronEngine PRIVATE ${IRON_LIB_DIR}/glad/include)
+	target_sources(IronEngine PRIVATE ${IRON_LIB_DIR}/glad/src)
 endif()
