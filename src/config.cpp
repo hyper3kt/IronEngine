@@ -145,7 +145,7 @@ class CTParser {
 
 		if(name.type == TOK_TEXT && colon.type == TOK_COLON) {
 			return Result<ConfigToken>(name);
-		} else return Result<ConfigToken>(Failure("Expected definition on " + RepresentTokenPosition(name), PARSER_EXPECTED_DEFINITION));
+		} else return Failure("Expected definition on " + RepresentTokenPosition(name), PARSER_EXPECTED_DEFINITION);
 	}
 
 	bool ExpectListItem() {
@@ -172,7 +172,7 @@ class CTParser {
 			ConfigToken token = ConsumeToken();
 
 			if(!IsTextual(token.type)) {
-				return Result<std::vector<ConfigToken>>(Failure("Expected list item char (>) on " + RepresentTokenPosition(token), PARSER_EXPECTED_LIST_ITEM));
+				return Failure("Expected list item char (>) on " + RepresentTokenPosition(token), PARSER_EXPECTED_LIST_ITEM);
 			}
 
 			tokens.push_back(token);
@@ -194,7 +194,7 @@ class CTParser {
 			Result<ConfigToken> tokenResult = ExpectDefinition();
 
 			if(!tokenResult.Success()) {
-				return Result<CTParserNode>(tokenResult.GetFailure());
+				return tokenResult.GetFailure();
 			}
 
 			CTParserNode definition = CTParserNode(TREE_DEFINITION, tokenResult.GetValue().data);
@@ -206,12 +206,7 @@ class CTParser {
 				definition.children.push_back(CTParserNode(TREE_ITEM, token.data));
 				origin.children.push_back(definition);
 				continue;
-			} else if(token.type != TOK_LIST_ITEM) return Result<CTParserNode>(
-					Failure(
-						"Expected list item char (>) on " + RepresentTokenPosition(token), 
-						PARSER_EXPECTED_LIST_ITEM
-					)
-				);
+			} else if(token.type != TOK_LIST_ITEM) return Failure("Expected list item char (>) on " + RepresentTokenPosition(token), PARSER_EXPECTED_LIST_ITEM);
 
 			Result<std::vector<ConfigToken>> listResult = ExpectList();
 
@@ -226,7 +221,7 @@ class CTParser {
 			}
 		}
 
-		return Result<CTParserNode>(origin);
+		return origin;
 	}
 };
 
@@ -262,7 +257,7 @@ Result<ConfigStatus> Config::Load() {
 	boost::filesystem::path configPath(path);
 
 	if(!boost::filesystem::exists(configPath)) {
-		return Result<ConfigStatus>(Failure("The path: " + path + " was not found on the system", IRON_CONFIG_NONEXISTENT_FILE));
+		return Failure("The path: " + path + " was not found on the system", IRON_CONFIG_NONEXISTENT_FILE);
 	}
 
 	boost::filesystem::ifstream config(configPath);
@@ -283,17 +278,17 @@ Result<ConfigStatus> Config::Load() {
 	Result<CTParserNode> tree = parser.ParseTokens();
 
 	if(!tree.Success()) {
-		return Result<ConfigStatus>(Failure(tree.GetFailure().GetFailureReason(), IRON_CONFIG_PARSER_FAILED));
+		return Failure(tree.GetFailure().GetFailureReason(), IRON_CONFIG_PARSER_FAILED);
 	}
 
 	map = CompileTree(tree.GetValue());
 
-	return Result<ConfigStatus>(IRON_CONFIG_OKAY);
+	return IRON_CONFIG_OKAY;
 }
 
 Result<ConfigEntry> Config::GetEntry(std::string name) {
 	if(!HasEntry(name)) {
-		return Result<ConfigEntry>(Failure("Entry " + name + " doesn't exist for config file: " + path, IRON_CONFIG_NONEXISTENT_ENTRY));
+		return Failure("Entry " + name + " doesn't exist for config file: " + path, IRON_CONFIG_NONEXISTENT_ENTRY);
 	}
 
 	if(!HasEntryInFile(name)) {
@@ -375,7 +370,7 @@ Result<ConfigStatus> Config::SaveChanges() {
 	boost::filesystem::ofstream config(path);
 
 	if(!config.is_open()) {
-		return Result<ConfigStatus>(Failure(IRON_CONFIG_SAVE_FAILED));
+		return Failure(IRON_CONFIG_SAVE_FAILED);
 	}
 
 	for(it = map.begin(); it != map.end(); it++) {
@@ -402,5 +397,5 @@ Result<ConfigStatus> Config::SaveChanges() {
 
 	config.close();
 
-	return Result<ConfigStatus>(IRON_CONFIG_OKAY);
+	return IRON_CONFIG_OKAY;
 }
