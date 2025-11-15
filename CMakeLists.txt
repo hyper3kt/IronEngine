@@ -21,17 +21,17 @@ find_package(glm QUIET)
 if(EXISTS "${IRON_LIB_DIR}/sdl/CMakeLists.txt")
     add_subdirectory("${IRON_LIB_DIR}/sdl" EXCLUDE_FROM_ALL)
 elseif(SDL3_FOUND)
-    message(STATUS "Found SDL3 system installation")
+    message(STATUS "Found SDL!")
 else()
-    message(FATAL_ERROR "Could not find SDL Git submodule. You must run 'git submodule update --init --recursive' to install the submodules, then rerun CMake.")
+    message(FATAL_ERROR "Could not find SDL. Please either install SDL or run 'git submodule update --init --recursive' to install all submodules.")
 endif()
 
 if(EXISTS "${IRON_LIB_DIR}/glm/CMakeLists.txt")
     add_subdirectory("${IRON_LIB_DIR}/glm" EXCLUDE_FROM_ALL)
 elseif(glm_FOUND)
-    message(STATUS "Found GLM system installation")
+    message(STATUS "Found GLM!")
 else()
-    message(FATAL_ERROR "Could not find GLM Git submodule. You must run 'git submodule update --init --recursive' to install the submodules, then rerun CMake.")
+    message(FATAL_ERROR "Could not find GLM. Please either install GLM or run 'git submodule update --init --recursive' to install all submodules.")
 endif()
 
 find_package(Boost REQUIRED)
@@ -47,7 +47,9 @@ target_include_directories(IronEngine PRIVATE
     ${IRON_PRIVATE_HEADERS}
     ${Boost_INCLUDE_DIRS}
     ${SDL3_INCLUDE_DIRS}
+    ${IRON_LIB_DIR}/glad/include
 )
+target_sources(IronEngine PRIVATE ${IRON_LIB_DIR}/glad/src)
 target_link_libraries(IronEngine PRIVATE 
     Boost::boost
     SDL3::SDL3
@@ -55,7 +57,4 @@ target_link_libraries(IronEngine PRIVATE
 if (USE_VULKAN)
     target_include_directories(IronEngine PRIVATE ${Vulkan_INCLUDE_DIRS})
     target_link_libraries(IronEngine PRIVATE Vulkan::Vulkan)
-else()
-	target_include_directories(IronEngine PRIVATE ${IRON_LIB_DIR}/glad/include)
-	target_sources(IronEngine PRIVATE ${IRON_LIB_DIR}/glad/src)
 endif()
