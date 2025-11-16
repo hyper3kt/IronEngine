@@ -96,14 +96,12 @@ void SerialArray::Remove(int index) {
     }
 }
 
-// TODO: impl default errors that are included with result.hpp
-
-Serial* SerialArray::Get(int index) {
+Result<Serial*> SerialArray::Get(int index) {
     if(WithinBounds(index)) {
         return serials.at(index);
     }
 
-    return nullptr;
+    return Failure(IRON_RESULT_NONEXISTENT_REQUEST);
 }
 
 bool SerialArray::IsEmpty() {

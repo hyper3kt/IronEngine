@@ -1,5 +1,7 @@
 #pragma once
 
+#include "iron/result.hpp"
+
 #include <iostream>
 #include <vector>
 
@@ -71,7 +73,7 @@ namespace Iron {
 
         void Append(Serial* serial);
         void Remove(int index);
-        Serial* Get(int index);
+        Result<Serial*> Get(int index);
         bool IsEmpty();
 
     };
