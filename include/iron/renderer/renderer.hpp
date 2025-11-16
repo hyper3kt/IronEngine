@@ -2,13 +2,13 @@
 
 namespace Iron {
 
+    class Scene;
+
     class Renderer {
 
         public:
 
-        Renderer();
-
-        void Prepare();
+        virtual void Tick() = 0;
 
     };
 

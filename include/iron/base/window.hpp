@@ -1,8 +1,11 @@
 #pragma once
 
+#include "iron/result.hpp"
+
 #include <iostream>
 
-typedef struct SDL_Window;
+struct SDL_Window;
+struct SDL_GLContextState* SDL_GLContext;
 
 namespace Iron {
 
@@ -18,6 +21,8 @@ namespace Iron {
 
         static WindowSystemMetadata wsm;
         SDL_Window* window;
+        SDL_GLContext glContext;
+        Result<EngineResult> status = IRON_RESULT_UNINITIALIZED;
 
         public:
         Window(int width, int height);
@@ -29,8 +34,8 @@ namespace Iron {
         static void KillSystem();
         static void SetWindowMetadata(WindowSystemMetadata wsm);
         static WindowSystemMetadata GetWindowMetadata();
-
-        void PollEvents();
+        
+        Result<EngineResult> GetStatus();
         void Kill();
 
     };

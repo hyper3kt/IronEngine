@@ -10,6 +10,8 @@ namespace Iron {
 
         OpenGLRenderer();
 
+        void Tick();
+
     };
 
 }

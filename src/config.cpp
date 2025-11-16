@@ -253,11 +253,11 @@ Config::Config(std::string path) {
 	this->path = path;
 }
 
-Result<ConfigStatus> Config::Load() {
+Result<EngineResult> Config::Load() {
 	boost::filesystem::path configPath(path);
 
 	if(!boost::filesystem::exists(configPath)) {
-		return Failure("The path: " + path + " was not found on the system", IRON_CONFIG_NONEXISTENT_FILE);
+		return Failure("The path: " + path + " was not found on the system", IRON_RESULT_NONEXISTENT_FILE);
 	}
 
 	boost::filesystem::ifstream config(configPath);
@@ -278,17 +278,17 @@ Result<ConfigStatus> Config::Load() {
 	Result<CTParserNode> tree = parser.ParseTokens();
 
 	if(!tree.Success()) {
-		return Failure(tree.GetFailure().GetFailureReason(), IRON_CONFIG_PARSER_FAILED);
+		return Failure(tree.GetFailure().GetFailureReason(), IRON_RESULT_FAILED);
 	}
 
 	map = CompileTree(tree.GetValue());
 
-	return IRON_CONFIG_OKAY;
+	return IRON_RESULT_OKAY;
 }
 
 Result<ConfigEntry> Config::GetEntry(std::string name) {
 	if(!HasEntry(name)) {
-		return Failure("Entry " + name + " doesn't exist for config file: " + path, IRON_CONFIG_NONEXISTENT_ENTRY);
+		return Failure("Entry " + name + " doesn't exist for config file: " + path, IRON_RESULT_NONEXISTENT_REQUEST);
 	}
 
 	if(!HasEntryInFile(name)) {
@@ -358,7 +358,7 @@ std::string ProperWrappedEntry(std::string value) {
 	return value;
 }
 
-Result<ConfigStatus> Config::SaveChanges() {
+Result<EngineResult> Config::SaveChanges() {
 	boost::filesystem::remove(path);
 
 	boost::unordered_map<std::string, ConfigEntry>::iterator it;
@@ -370,7 +370,7 @@ Result<ConfigStatus> Config::SaveChanges() {
 	boost::filesystem::ofstream config(path);
 
 	if(!config.is_open()) {
-		return Failure(IRON_CONFIG_SAVE_FAILED);
+		return Failure(IRON_RESULT_FAILED);
 	}
 
 	for(it = map.begin(); it != map.end(); it++) {
@@ -397,5 +397,5 @@ Result<ConfigStatus> Config::SaveChanges() {
 
 	config.close();
 
-	return IRON_CONFIG_OKAY;
+	return IRON_RESULT_OKAY;
 }

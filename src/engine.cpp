@@ -3,13 +3,18 @@
 #include "iron/config.hpp"
 #include "renderer/vulkan/vulkan_renderer.hpp"
 #include "renderer/opengl/opengl_renderer.hpp"
+#include "iron/assets/asset_manager.hpp"
+#include "iron/base/input_manager.hpp"
 
 #include <SDL3/SDL.h>
 
 using namespace Iron;
 
+Config Engine::config = Config("");
+Config Engine::settings = Config("");
+
 int Engine::selectedWindow = 0;
-Config Engine::config;
+
 std::string Engine::gameName = "Iron Engine";
 bool Engine::shouldKill = false;
 bool Engine::useVulkan = false;
@@ -22,7 +27,7 @@ bool Engine::ShouldUseVulkan() {
 
 void Engine::Init(std::string gameConfig, std::string settingsPath) {
     config = Config(gameConfig);
-    Result<ConfigStatus> loadResult = config.Load();
+    Result<EngineResult> loadResult = config.Load();
 
     if(!loadResult.Success()) {
         Kill();
@@ -65,28 +70,18 @@ void Engine::Init(std::string gameConfig, std::string settingsPath) {
 
     Window::SetWindowMetadata(wsm);
 
-    /*useVulkan = Window::AttemptLoadVulkan();
+    useVulkan = Window::AttemptLoadVulkan();
 
     if(!useVulkan) {
         if(!Window::AttemptLoadOpenGL()) {
             Kill();
             return;
         }
-    }*/
-
-    if(!Window::AttemptLoadOpenGL()) {
-        Kill();
-        return;
-    }
-
-    if(useVulkan) {
-        renderer = VulkanRenderer();
-    } else renderer = OpenGLRenderer();
-
-    
+        renderer = new OpenGLRenderer();
+    } else renderer = new VulkanRenderer();
 
     while(!shouldKill) {
-        windows.at(selectedWindow).PollEvents();
+        inputManager.PollEvents();
     }
 
     Kill();

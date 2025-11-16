@@ -19,6 +19,16 @@ namespace Iron {
 
     };
 
+    enum EngineResult {
+        IRON_RESULT_OKAY,
+        IRON_RESULT_CREATED,
+        IRON_RESULT_UNINITIALIZED,
+        IRON_RESULT_FAILED,
+        IRON_RESULT_NONEXISTENT_FILE,
+        IRON_RESULT_NONEXISTENT_REQUEST,
+
+    };
+
     template<typename Ok>
     class Result {
 

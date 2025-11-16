@@ -14,14 +14,6 @@ namespace Iron {
         IRON_ENTRY_DELETE,
     };
 
-    enum ConfigStatus {
-        IRON_CONFIG_NONEXISTENT_FILE,
-        IRON_CONFIG_NONEXISTENT_ENTRY,        
-        IRON_CONFIG_PARSER_FAILED,
-        IRON_CONFIG_SAVE_FAILED,
-        IRON_CONFIG_OKAY,
-    };
-
     struct ConfigEntry {
 
         union ConfigEntryData {
@@ -82,14 +74,14 @@ namespace Iron {
         static Config CreateEmpty(std::string name);
         static Config CreateDefaultSettings();
 
-        Result<ConfigStatus> Load();
+        Result<EngineResult> Load();
         Result<ConfigEntry> GetEntry(std::string name);
         void SetEntry(std::string name, std::string value);
         void SetEntry(std::string name, std::vector<std::string> value);
         void RemoveEntry(std::string name);
         bool HasEntry(std::string name);
         bool HasEntryInFile(std::string name);
-        Result<ConfigStatus> SaveChanges();
+        Result<EngineResult> SaveChanges();
     };
 
 }

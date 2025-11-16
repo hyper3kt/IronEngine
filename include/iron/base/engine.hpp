@@ -8,16 +8,24 @@ namespace Iron {
 	class Window;
 	class Config;
 	class Renderer;
+	class AssetManager;
+	class InputManager;
 
 	class Engine {
 
+		static Renderer* renderer;
+		static AssetManager assetManager;
+		static InputManager inputManager;
+
 		static std::vector<Window> windows;
-		static Renderer renderer;
 		static int selectedWindow;
+
 		static std::string gameName;
 		static Config config;
 		static Config settings;
+
 		static bool shouldKill;
+		
 		static bool useVulkan;
 
 		Engine();
