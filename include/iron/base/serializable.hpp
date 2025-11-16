@@ -15,11 +15,19 @@
     inline SerialType GetType() { \
         return serialtype; \
     } \
+    void Pass(std::vector<uchar> loadedValue, FileTypesSizes* sizes); \
     classname operator=(type& rhs); \
     operator type(); \
 } \
 
 namespace Iron {
+
+    struct FileTypesSizes {
+        size_t sizeBool;
+        size_t sizeDouble;
+        size_t sizeFloat;
+        size_t sizeInt;
+    };
 
     class Serializable;
 
@@ -49,7 +57,7 @@ namespace Iron {
         virtual std::vector<uchar> GetRepresentation();
         const char* GetName();
         virtual size_t GetSize();
-        virtual void Pass(std::vector<uchar> loadedValue);
+        virtual void Pass(std::vector<uchar> loadedValue, FileTypesSizes* sizes);
         virtual inline SerialType GetType() {
             return IRON_SERIAL;
         }
@@ -72,10 +80,12 @@ namespace Iron {
 
         SerialArray(Serializable* owner, const char* name);
         std::vector<uchar> GetRepresentation();
+        void Pass(std::vector<uchar> loadedValue, FileTypesSizes* sizes);
         size_t GetSize();
 
         void Append(Serial* serial);
         void Remove(int index);
+        void Flush();
         Result<Serial*> Get(int index);
         bool IsEmpty();
 
@@ -88,7 +98,7 @@ namespace Iron {
         public:
 
         void RegisterSerial(Serial* serial);
-        void LoadSerials(std::vector<uchar> buffer);
+        void LoadSerials(std::vector<uchar> buffer, FileTypesSizes* sizes);
         std::vector<uchar> Serialize();
 
     };
