@@ -189,7 +189,7 @@ void Serializable::LoadSerials(std::vector<uchar> buffer) {
         char* name = (char*) malloc(nameSize * sizeof(char));
         int nameIdx = 0;
 
-        for(int j = i + 2 + skipDataSize; j < i + nameSize; j++) {
+        for(int j = i + 2 + skipDataSize; j < i + 2 + skipDataSize + nameSize; j++) {
             name[nameIdx] = buffer.at(j);
             nameIdx++;
         }
