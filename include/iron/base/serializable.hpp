@@ -10,7 +10,7 @@
     public: \
     classname(Serializable* owner, const char* name, type value); \
     classname(Serializable* owner, type value); \
-    const char* GetRepresentation(); \
+    std::vector<uchar> GetRepresentation(); \
     size_t GetSize(); \
     inline SerialType GetType() { \
         return serialtype; \
@@ -22,6 +22,8 @@
 namespace Iron {
 
     class Serializable;
+
+    typedef unsigned char uchar;
 
     enum SerialType {
         IRON_SERIAL,
@@ -44,9 +46,10 @@ namespace Iron {
 
         Serial(Serializable* owner, const char* name);
 
-        virtual const char* GetRepresentation();
+        virtual std::vector<uchar> GetRepresentation();
         const char* GetName();
         virtual size_t GetSize();
+        virtual void Pass(std::vector<uchar> loadedValue);
         virtual inline SerialType GetType() {
             return IRON_SERIAL;
         }
@@ -68,7 +71,7 @@ namespace Iron {
         public:
 
         SerialArray(Serializable* owner, const char* name);
-        const char* GetRepresentation();
+        std::vector<uchar> GetRepresentation();
         size_t GetSize();
 
         void Append(Serial* serial);
@@ -80,31 +83,14 @@ namespace Iron {
 
     class Serializable {
 
-        std::vector<Serial*> serialObjs;
+        std::vector<Serial*> serials;
 
         public:
 
         void RegisterSerial(Serial* serial);
-        void LoadSerials(std::vector<unsigned char> buffer);
-        std::vector<unsigned char> Serialize();
+        void LoadSerials(std::vector<uchar> buffer);
+        std::vector<uchar> Serialize();
 
     };
 
 }
-
-/*
-
-SerialArray arr = SerialArray(this, "foo");
-SerialInt integer = SerialInt(this, "bar", 0);
-
-for(int i = 0; i < arr.Size(); i++) {
-    Serial* serial = arr.Get(i);
-}
-
-{
-5 8 integer 1337
-6 7 4 string foo
-1 6 4 arr 5 1248 5 420 5 69 5 0
-}
-
-*/
