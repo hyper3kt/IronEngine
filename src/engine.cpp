@@ -16,6 +16,7 @@ int Engine::selectedWindow = 0;
 
 std::string Engine::gameName = "Iron Engine";
 bool Engine::shouldKill = false;
+bool Engine::loadedConfigs = false;
 bool Engine::useVulkan = false;
 
 bool Engine::ShouldUseVulkan() {
@@ -41,15 +42,19 @@ Result<EngineResult> Engine::LoadConfigs(std::string game, std::string settingsP
         settings = Config::CreateDefaultSettings();
     }
 
+    loadedConfigs = true;
+
     return IRON_RESULT_OKAY;
 }
 
-void Engine::Init(std::string gameConfig, std::string settingsPath) {
-    auto attemptLoadConfig = LoadConfigs(gameConfig, settingsPath);
+void Engine::Init() {
+    if(!loadedConfigs) {
+        auto attemptLoadConfig = LoadConfigs("./game.ic", "./settings.ic");
 
-    if(!attemptLoadConfig.Success()) {
-        Kill();
-        return;
+        if(!attemptLoadConfig.Success()) {
+            Kill();
+            return;
+        }
     }
     
     if(config.HasEntry("name")) {

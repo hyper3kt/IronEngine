@@ -27,13 +27,13 @@ namespace Iron {
 		static Config settings;
 
 		static bool shouldKill;
-		
+		static bool loadedConfigs;
 		static bool useVulkan;
 
 		Engine();
 
 		public:
-		static void Init(std::string game, std::string settings);
+		static void Init();
 		static Result<EngineResult> LoadConfigs(std::string game, std::string settings);
 		static void Kill();
 
