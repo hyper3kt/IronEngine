@@ -304,10 +304,17 @@ bool Config::HasEntry(std::string name) {
 	}
 
 	if(changes.contains(name)) {
-		return changes.at(name).type != IRON_ENTRY_DELETE;
+		return changes.at(name).type != IRON_ENTRY_DELETED;
 	}
 
 	return false;
+}
+
+ConfigEntryType Config::GetEntryType(std::string name) {
+	if(HasEntry(name)) {
+		return GetEntry(name).GetValue().type;
+	}
+	return IRON_ENTRY_NONEXISTENT;
 }
 
 bool Config::HasEntryInFile(std::string name) {
@@ -341,7 +348,7 @@ void Config::SetEntry(std::string name, std::vector<std::string> value) {
 }
 
 void Config::RemoveEntry(std::string name) {
-	changes[name] = ConfigEntry("", IRON_ENTRY_DELETE, "");
+	changes[name] = ConfigEntry("", IRON_ENTRY_DELETED, "");
 }
 
 bool StartsWithIllegalChar(std::string value) {
@@ -374,7 +381,7 @@ Result<EngineResult> Config::SaveChanges() {
 	}
 
 	for(it = map.begin(); it != map.end(); it++) {
-		if(it->second.type == IRON_ENTRY_DELETE) {
+		if(it->second.type == IRON_ENTRY_DELETED) {
 			continue;
 		}
 

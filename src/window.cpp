@@ -1,5 +1,6 @@
 #include "iron/base/engine.hpp"
 #include "iron/base/window.hpp"
+#include "iron/config.hpp"
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
@@ -39,7 +40,31 @@ void Window::Kill() {
 }
 
 bool Window::InitSystem() {
-    return SDL_Init(SDL_INIT_VIDEO);
+    if(!SDL_Init(SDL_INIT_VIDEO)) {
+        return false;
+    }
+
+    Config config = Engine::GetGameConfig();
+
+    wsm.name = Engine::GetGameName();
+
+    if(config.GetEntryType("version") == IRON_ENTRY_STRING) {
+        wsm.version = config.GetEntry("version").GetValue().data.string;
+    }
+
+    if(config.GetEntryType("appid") == IRON_ENTRY_STRING) {
+        wsm.appId = config.GetEntry("appid").GetValue().data.string;
+    }
+
+    if(config.GetEntryType("developer") == IRON_ENTRY_STRING) {
+        wsm.developer = config.GetEntry("developer").GetValue().data.string;
+    }
+
+    if(config.GetEntryType("copyright") == IRON_ENTRY_STRING) {
+        wsm.copyright = config.GetEntry("copyright").GetValue().data.string;
+    }
+
+    return true;
 }
 
 bool Window::AttemptLoadVulkan() {

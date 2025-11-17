@@ -1,6 +1,5 @@
 #include "iron/base/engine.hpp"
 #include "iron/base/window.hpp"
-#include "iron/config.hpp"
 #include "renderer/vulkan/vulkan_renderer.hpp"
 #include "renderer/opengl/opengl_renderer.hpp"
 #include "iron/assets/asset_manager.hpp"
@@ -19,19 +18,20 @@ std::string Engine::gameName = "Iron Engine";
 bool Engine::shouldKill = false;
 bool Engine::useVulkan = false;
 
-#define GetStrFromEntry(str) config.GetEntry(str).GetValue().data.string;
-
 bool Engine::ShouldUseVulkan() {
     return useVulkan;
 }
 
-void Engine::Init(std::string gameConfig, std::string settingsPath) {
-    config = Config(gameConfig);
-    Result<EngineResult> loadResult = config.Load();
+Config Engine::GetGameConfig() {
+    return config;
+}
 
+Result<EngineResult> Engine::LoadConfigs(std::string game, std::string settingsPath) {
+    config = Config(game);
+    Result<EngineResult> loadResult = config.Load();
+    
     if(!loadResult.Success()) {
-        Kill();
-        return;
+        return loadResult;
     }
 
     settings = Config(settingsPath);
@@ -40,35 +40,24 @@ void Engine::Init(std::string gameConfig, std::string settingsPath) {
     if(!loadResult.Success()) {
         settings = Config::CreateDefaultSettings();
     }
+
+    return IRON_RESULT_OKAY;
+}
+
+void Engine::Init(std::string gameConfig, std::string settingsPath) {
+    auto attemptLoadConfig = LoadConfigs(gameConfig, settingsPath);
+
+    if(!attemptLoadConfig.Success()) {
+        Kill();
+        return;
+    }
     
-    Window::InitSystem();
-
-    WindowSystemMetadata wsm = WindowSystemMetadata();
-
     if(config.HasEntry("name")) {
-        std::string entry = GetStrFromEntry("name");
-
-        wsm.name = entry;
+        std::string entry = config.GetEntry("name").GetValue().data.string;
         gameName = entry;
     }
 
-    if(config.HasEntry("version")) {
-        wsm.version = GetStrFromEntry("version");
-    }
-
-    if(config.HasEntry("appid")) {
-        wsm.appId = GetStrFromEntry("appid");
-    }
-
-    if(config.HasEntry("developer")) {
-        wsm.developer = GetStrFromEntry("developer");
-    }
-
-    if(config.HasEntry("copyright")) {
-        wsm.copyright = GetStrFromEntry("copyright");
-    }
-
-    Window::SetWindowMetadata(wsm);
+    Window::InitSystem();
 
     useVulkan = Window::AttemptLoadVulkan();
 
@@ -89,6 +78,7 @@ void Engine::Init(std::string gameConfig, std::string settingsPath) {
 
 void Engine::Kill() {
     Window::KillSystem();
+    delete renderer;
 }
 
 void Engine::SetGameName(std::string name) {

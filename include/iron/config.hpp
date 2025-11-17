@@ -11,7 +11,8 @@ namespace Iron {
     enum ConfigEntryType {
         IRON_ENTRY_STRING,
         IRON_ENTRY_STRING_LIST,
-        IRON_ENTRY_DELETE,
+        IRON_ENTRY_DELETED,
+        IRON_ENTRY_NONEXISTENT,
     };
 
     struct ConfigEntry {
@@ -61,6 +62,19 @@ namespace Iron {
             this->type = other.type;
         }
 
+        inline Result<std::string> GetString() {
+            if(type == IRON_ENTRY_STRING) {
+                return data.string;
+            }
+            return Failure(IRON_RESULT_NONEXISTENT_REQUEST);
+        }
+
+        inline Result<std::vector<std::string>> GetStringList() {
+            if(type == IRON_ENTRY_STRING_LIST) {
+                return data.list;
+            }
+            return Failure(IRON_RESULT_NONEXISTENT_REQUEST);
+        }
     };
 
     class Config {
@@ -76,6 +90,7 @@ namespace Iron {
 
         Result<EngineResult> Load();
         Result<ConfigEntry> GetEntry(std::string name);
+        ConfigEntryType GetEntryType(std::string name);
         void SetEntry(std::string name, std::string value);
         void SetEntry(std::string name, std::vector<std::string> value);
         void RemoveEntry(std::string name);

@@ -1,12 +1,14 @@
 #pragma once
 
+#include "iron/config.hpp"
+#include "iron/result.hpp"
+
 #include <iostream>
 #include <vector>
 
 namespace Iron {
 
 	class Window;
-	class Config;
 	class Renderer;
 	class AssetManager;
 	class InputManager;
@@ -31,11 +33,13 @@ namespace Iron {
 		Engine();
 
 		public:
-		static void Init(std::string gameConfig, std::string settingsPath);
+		static void Init(std::string game, std::string settings);
+		static Result<EngineResult> LoadConfigs(std::string game, std::string settings);
 		static void Kill();
 
 		static void SetGameName(std::string name);
 		static std::string GetGameName();
+		static Config GetGameConfig();
 
 		static bool ShouldUseVulkan();
 	};
