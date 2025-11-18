@@ -1,7 +1,7 @@
 #pragma once
 
 #include "iron/base/component.hpp"
-#include "iron/base/serializable.hpp"
+#include "iron/base/archive.hpp"
 #include "iron/result.hpp"
 
 #include <iostream>
@@ -9,7 +9,7 @@
 
 namespace Iron {
 
-    class Object : public Serializable {
+    class Object : public Archive {
 
         std::vector<Component*> components;
         std::vector<Object*> children;
@@ -27,6 +27,8 @@ namespace Iron {
         Result<T*> GetComponent();
         template<typename T>
         bool HasComponent();
+
+        virtual void Tick(float dt);
         
     };
 
