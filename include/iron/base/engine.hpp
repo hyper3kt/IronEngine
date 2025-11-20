@@ -10,14 +10,12 @@ namespace Iron {
 
 	class Window;
 	class Renderer;
-	class AssetManager;
-	class InputManager;
+	class Scene;
 
 	class Engine {
 
 		static Renderer* renderer;
-		static AssetManager assetManager;
-		static InputManager inputManager;
+		static Scene* scene;
 
 		static std::vector<Window> windows;
 		static int selectedWindow;
@@ -36,6 +34,8 @@ namespace Iron {
 		static void Init();
 		static Result<EngineResult> LoadConfigs(std::string game, std::string settings);
 		static void Kill();
+		
+		static Scene* GetCurrentScene();
 
 		static void SetGameName(std::string name);
 		static std::string GetGameName();

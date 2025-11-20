@@ -1,15 +1,12 @@
 #pragma once
 
-#include <iostream>
-
 namespace Iron {
 
-    class Asset {
+    class RenderComponent {
 
         public:
 
         
-
     };
 
 }

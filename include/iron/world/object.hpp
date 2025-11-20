@@ -28,6 +28,10 @@ namespace Iron {
         template<typename T>
         bool HasComponent();
 
+        void Prepare();
+        virtual void Init();
+        void Orphan();
+        void Delete();
         virtual void Tick(float dt);
         
     };

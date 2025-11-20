@@ -2,8 +2,7 @@
 #include "iron/base/window.hpp"
 #include "renderer/vulkan/vulkan_renderer.hpp"
 #include "renderer/opengl/opengl_renderer.hpp"
-#include "iron/assets/asset_manager.hpp"
-#include "iron/base/input_manager.hpp"
+#include "iron/world/scene.hpp"
 
 #include <SDL3/SDL.h>
 
@@ -11,6 +10,7 @@ using namespace Iron;
 
 Config Engine::config = Config("");
 Config Engine::settings = Config("");
+Scene* Engine::scene = new Scene();
 
 int Engine::selectedWindow = 0;
 
@@ -62,6 +62,11 @@ void Engine::Init() {
         gameName = entry;
     }
 
+    if(!config.HasEntry("default scene")) {
+        Kill();
+        return;
+    }
+
     Window::InitSystem();
 
     useVulkan = Window::AttemptLoadVulkan();
@@ -74,8 +79,18 @@ void Engine::Init() {
         renderer = new OpenGLRenderer();
     } else renderer = new VulkanRenderer();
 
+    auto attemptLoadDefaultScene = Scene::LoadScene(config.GetEntry("default scene").GetValue().data.string.c_str());
+
+    if(!attemptLoadDefaultScene.Success()) {
+        Kill();
+        return;
+    }
+
+    scene = &attemptLoadDefaultScene.GetValue();
+
     while(!shouldKill) {
-        inputManager.PollEvents();
+        scene->Tick();
+        renderer->Tick();
     }
 
     Kill();

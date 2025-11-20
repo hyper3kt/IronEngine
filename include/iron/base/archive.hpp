@@ -1,8 +1,14 @@
 #pragma once
 
+#include <iostream>
+#include <vector>
+
 namespace Iron {
 
     class Archive {
+
+        bool isChildArchive = false;
+        std::vector<Archive*> childArchives;
 
         public:
 
@@ -10,6 +16,8 @@ namespace Iron {
 
         template<typename T>
         class Item {
+
+            T value;
 
             public:
 
@@ -20,6 +28,8 @@ namespace Iron {
 
         template<typename T>
         Item<T> Retrieve(const char* name, T def);
+        void AttachArchive(Archive* archive);
+        void DetachArchive(Archive* archive);
 
     };
 

@@ -1,12 +1,17 @@
 #pragma once
 
-namespace Iron {
+#include "iron/world/camera.hpp"
 
-    class Scene;
+namespace Iron {
 
     class Renderer {
 
+        Camera* camera;
+
         public:
+
+        void SetCamera(Camera* camera);
+        Camera* GetCamera();
 
         virtual void Tick() = 0;
 
