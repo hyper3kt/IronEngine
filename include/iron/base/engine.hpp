@@ -2,20 +2,20 @@
 
 #include "iron/config.hpp"
 #include "iron/result.hpp"
+#include "iron/renderer/renderer.hpp"
+#include "iron/base/window.hpp"
+#include "iron/world/scene.hpp"
 
 #include <iostream>
 #include <vector>
 
 namespace Iron {
 
-	class Window;
-	class Renderer;
-	class Scene;
-
 	class Engine {
 
 		static Renderer* renderer;
 		static Scene* scene;
+		static std::vector<ObjectRegistry> registry;
 
 		static std::vector<Window> windows;
 		static int selectedWindow;
@@ -41,7 +41,11 @@ namespace Iron {
 		static std::string GetGameName();
 		static Config GetGameConfig();
 
+		static void AddNewObject(ObjectRegistry reg);
+		static std::vector<ObjectRegistry> GetObjectRegistry();
+
 		static bool ShouldUseVulkan();
+
 	};
 
 }

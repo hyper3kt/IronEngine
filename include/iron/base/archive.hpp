@@ -9,6 +9,7 @@ namespace Iron {
 
         bool isChildArchive = false;
         std::vector<Archive*> childArchives;
+        std::string name;
 
         public:
 

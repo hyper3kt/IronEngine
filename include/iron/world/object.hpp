@@ -14,9 +14,6 @@ namespace Iron {
         std::vector<Component*> components;
         std::vector<Object*> children;
 
-        std::string name = "Object";
-        int id;
-
         public:
 
         template<typename T>
@@ -33,7 +30,13 @@ namespace Iron {
         void Orphan();
         void Delete();
         virtual void Tick(float dt);
-        
+
+        static void DeclareObject(std::string typeName, Object* instance);
+    };
+
+    struct ObjectRegistry {
+        std::string typeName;
+        Object* instance;
     };
 
 }

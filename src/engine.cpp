@@ -86,6 +86,7 @@ void Engine::Init() {
         return;
     }
 
+    // The first scene shouldn't explicitly load its state.
     scene = &attemptLoadDefaultScene.GetValue();
 
     while(!shouldKill) {
@@ -107,4 +108,12 @@ void Engine::SetGameName(std::string name) {
 
 std::string Engine::GetGameName() {
 	return gameName;
+}
+
+void Engine::AddNewObject(ObjectRegistry reg) {
+    registry.push_back(reg);
+}
+
+std::vector<ObjectRegistry> Engine::GetObjectRegistry() {
+    return registry;
 }
