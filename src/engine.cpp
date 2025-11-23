@@ -117,3 +117,13 @@ void Engine::AddNewObject(ObjectRegistry reg) {
 std::vector<ObjectRegistry> Engine::GetObjectRegistry() {
     return registry;
 }
+
+bool Engine::HasObjectRegistered(std::string name) {
+    for(int i = 0; i < registry.size(); i++) {
+        if(registry.at(i).typeName == name) {
+            return true;
+        }
+    }
+
+    return false;
+}
