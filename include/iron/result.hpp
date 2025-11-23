@@ -26,7 +26,8 @@ namespace Iron {
         IRON_RESULT_FAILED,
         IRON_RESULT_NONEXISTENT_FILE,
         IRON_RESULT_NONEXISTENT_REQUEST,
-
+        IRON_RESULT_TOO_BIG, // Just like me
+        IRON_RESULT_IMPROPER_FORMAT,
     };
 
     template<typename Ok>

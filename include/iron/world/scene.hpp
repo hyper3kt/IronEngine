@@ -24,11 +24,13 @@ namespace Iron {
         template<typename T>
         std::vector<T*> GetObjectsByType();
         
-        int AddObject(Object* object);
+        void AddObject(Object* object);
         void RemoveObject(int id);
 
         void Tick();
         void Archive();
+        void FromState(const char* archivePath);
+        void BareLoad();
         void Unload();
 
     };

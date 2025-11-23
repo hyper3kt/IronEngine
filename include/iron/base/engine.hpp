@@ -43,6 +43,7 @@ namespace Iron {
 
 		static void AddNewObject(ObjectRegistry reg);
 		static std::vector<ObjectRegistry> GetObjectRegistry();
+		static bool HasObjectRegistered(std::string name);
 
 		static bool ShouldUseVulkan();
 

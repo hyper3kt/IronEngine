@@ -5,33 +5,112 @@
 
 namespace Iron {
 
+    class BoolItem;
+    class NumberItem;
+    class StringItem;
+    class ArrayItem;
+
     class Archive {
+        class Item;
 
         bool isChildArchive = false;
         std::vector<Archive*> childArchives;
+        std::vector<Item*> items;
         std::string name;
+        std::string type;
 
         public:
 
         Archive();
 
-        template<typename T>
+        enum ItemTypeID {
+            IRON_ITEM_ARRAY = 0xD0,
+            IRON_ITEM_BOOL = 0xD1,
+            IRON_ITEM_GENERIC = 0xD2,
+            IRON_ITEM_NUMBER = 0xD3,
+            IRON_ITEM_STRING = 0xD4,
+        };
+
         class Item {
 
-            T value;
+            Archive* owner;
+            std::string name;
 
             public:
 
-            T operator=(T& rhs);
-            operator T();
+            Item();
+            Item(Archive* owner);
+
+            void SetName(std::string name);
+
+            virtual ItemTypeID GetType();
+            virtual void Pass(std::vector<char> bytes);
 
         };
 
-        template<typename T>
-        Item<T> Retrieve(const char* name, T def);
+        BoolItem RetrieveBool(std::string name, bool def);
+        NumberItem RetrieveNumber(std::string name, double def);
+        NumberItem RetrieveNumber(std::string name, float def);
+        NumberItem RetrieveNumber(std::string name, int def);
+        StringItem RetrieveString(std::string name, std::string def);
+        ArrayItem RetrieveArray(std::string name);
+
+        void AttachItem(Item* item);
         void AttachArchive(Archive* archive);
         void DetachArchive(Archive* archive);
 
+        void SetName(std::string name);
+        void SetType(std::string type);
+
+    };
+
+    class ArrayItem : public Archive::Item {
+
+        std::vector<Archive::Item*> items;
+
+        public:
+
+        ArrayItem();
+        ArrayItem(Archive* owner);
+
+        void Append(Archive::Item* item);
+        void Remove(int idx);
+        void Pop();
+        int Size();
+        Archive::Item* At(int idx);
+
+    };
+
+    class BoolItem : public Archive::Item {
+
+        public:
+
+        BoolItem();
+        BoolItem(Archive* owner);
+        
+        void Pass(std::vector<char> bytes);
+
+    };
+
+    class NumberItem : public Archive::Item {
+
+        public:
+
+        NumberItem();
+        NumberItem(Archive* owner);
+
+        void Pass(std::vector<char> bytes);
+
+    };
+
+    class StringItem : public Archive::Item {
+
+        public:
+
+        StringItem();
+        StringItem(Archive* owner);
+
+        void Pass(std::string bytes);
     };
 
 }
