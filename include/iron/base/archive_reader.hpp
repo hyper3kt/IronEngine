@@ -40,7 +40,7 @@ namespace Iron {
         bool ExpectSingular(MagicNumbers magic);
         Result<std::string> ReadString();
         Result<Archive*> ReadArchive(MagicNumbers start, MagicNumbers end);
-        Result<std::vector<Archive::Item*>> ReadItems(Archive* owner, bool readStrings, MagicNumbers start, MagicNumbers end);
+        Result<std::vector<Item*>> ReadItems(Archive* owner, bool readStrings, MagicNumbers start, MagicNumbers end);
         Result<ArrayItem*> ReadArray(Archive* owner);
         Result<std::vector<char>> ReadBytes(int num);
 

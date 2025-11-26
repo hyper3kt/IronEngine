@@ -12,20 +12,7 @@ namespace Iron {
     class StringItem;
     class ArrayItem;
 
-    class Archive {
-        class Item;
-
-        bool isChildArchive = false;
-        std::vector<Archive*> childArchives;
-        std::vector<Item*> items;
-        std::string name;
-        std::string type;
-
-        public:
-
-        Archive();
-
-        enum ItemTypeID {
+    enum ItemTypeID {
             IRON_ITEM_ARRAY = 0xD0,
             IRON_ITEM_BOOL = 0xD1,
             IRON_ITEM_GENERIC = 0xD2,
@@ -33,7 +20,7 @@ namespace Iron {
             IRON_ITEM_STRING = 0xD4,
         };
 
-        class Item {
+    class Item {
 
             protected:
 
@@ -53,6 +40,18 @@ namespace Iron {
 
         };
 
+    class Archive {
+
+        bool isChildArchive = false;
+        std::vector<Archive*> childArchives;
+        std::vector<Item*> items;
+        std::string name;
+        std::string type;
+
+        public:
+
+        Archive();
+
         BoolItem* RetrieveBool(std::string name, bool def);
         NumberItem* RetrieveNumber(std::string name, double def);
         NumberItem* RetrieveNumber(std::string name, float def);
@@ -65,28 +64,31 @@ namespace Iron {
         void DetachArchive(Archive* archive);
 
         void SetName(std::string name);
+        std::string GetName();
         void SetType(std::string type);
+        std::string GetType();
 
+        void Clean();
     };
 
-    class ArrayItem : public Archive::Item {
+    class ArrayItem : public Item {
 
-        std::vector<Archive::Item*> items;
+        std::vector<Item*> items;
 
         public:
 
         ArrayItem();
         ArrayItem(Archive* owner);
 
-        void Append(Archive::Item* item);
+        void Append(Item* item);
         void Remove(int idx);
         void Pop();
         int Size();
-        Result<Archive::Item*> At(int idx);
+        Result<Item*> At(int idx);
 
     };
 
-    class BoolItem : public Archive::Item {
+    class BoolItem : public Item {
 
         bool value;
 
@@ -103,7 +105,7 @@ namespace Iron {
 
     };
 
-    class NumberItem : public Archive::Item {
+    class NumberItem : public Item {
 
         double value;
 
@@ -120,7 +122,7 @@ namespace Iron {
 
     };
 
-    class StringItem : public Archive::Item {
+    class StringItem : public Item {
 
         std::string value;
 

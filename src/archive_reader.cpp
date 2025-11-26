@@ -109,15 +109,15 @@ Result<ArrayItem*> ArchiveReader::ReadArray(Archive* owner) {
     return out;
 }
 
-Result<std::vector<Archive::Item*>> ArchiveReader::ReadItems(Archive* owner, bool readStrings, MagicNumbers start, MagicNumbers end) {
+Result<std::vector<Item*>> ArchiveReader::ReadItems(Archive* owner, bool readStrings, MagicNumbers start, MagicNumbers end) {
     if(!ExpectSingular(start)) {
         return Failure(IRON_RESULT_IMPROPER_FORMAT);
     }
 
-    std::vector<Archive::Item*> out;
+    std::vector<Item*> out;
 
     while(!ExpectSingular(end)) {
-        Archive::Item* item;
+        Item* item;
         auto name = Result<std::string>("");
 
         if(ReachedEnd()) {
@@ -133,7 +133,7 @@ Result<std::vector<Archive::Item*>> ArchiveReader::ReadItems(Archive* owner, boo
         }
 
         switch(Consume()) {
-            case Archive::ItemTypeID::IRON_ITEM_ARRAY:
+            case ItemTypeID::IRON_ITEM_ARRAY:
             auto getArray = ReadArray(owner);
 
             if(!getArray.Success()) {
@@ -142,7 +142,7 @@ Result<std::vector<Archive::Item*>> ArchiveReader::ReadItems(Archive* owner, boo
 
             item = getArray.GetValue();
             break;
-            case Archive::ItemTypeID::IRON_ITEM_BOOL:
+            case ItemTypeID::IRON_ITEM_BOOL:
             auto getBool = ReadBytes(1);
 
             if(!getBool.Success()) {
@@ -152,7 +152,7 @@ Result<std::vector<Archive::Item*>> ArchiveReader::ReadItems(Archive* owner, boo
             item = new BoolItem(owner);
             item->Pass(getBool.GetValue());
             break;
-            case Archive::ItemTypeID::IRON_ITEM_NUMBER:
+            case ItemTypeID::IRON_ITEM_NUMBER:
             auto getNumber = ReadBytes(8);
 
             if(!getNumber.Success()) {
@@ -162,7 +162,7 @@ Result<std::vector<Archive::Item*>> ArchiveReader::ReadItems(Archive* owner, boo
             item = new NumberItem(owner);
             item->Pass(getNumber.GetValue());
             break;
-            case Archive::ItemTypeID::IRON_ITEM_STRING:
+            case ItemTypeID::IRON_ITEM_STRING:
             auto getString = ReadString();
 
             if(!getString.Success()) {

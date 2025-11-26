@@ -6,11 +6,19 @@ void Archive::SetName(std::string name) {
     this->name = name;
 }
 
+std::string Archive::GetName() {
+    return name;
+}
+
 void Archive::SetType(std::string type) {
     this->type = type;
 }
 
-void Archive::AttachItem(Archive::Item* item) {
+std::string Archive::GetType() {
+    return type;
+}
+
+void Archive::AttachItem(Item* item) {
     items.push_back(item);
 }
 
@@ -20,6 +28,12 @@ void Archive::AttachArchive(Archive* archive) {
 
 void Archive::DetachArchive(Archive* archive) {
     // TODO
+}
+
+void Archive::Clean() {
+    for(int i = 0; i < items.size(); i++) {
+        delete items.at(i);
+    }
 }
 
 ArrayItem* Archive::RetrieveArray(std::string name) {
@@ -96,11 +110,11 @@ StringItem* Archive::RetrieveString(std::string name, std::string def) {
     return item;
 }
 
-Archive::Item::Item() {
+Item::Item() {
     owner = nullptr;
 }
 
-Archive::Item::Item(Archive* owner) {
+Item::Item(Archive* owner) {
     this->owner = owner;
     
     if(owner != nullptr) {
@@ -108,19 +122,19 @@ Archive::Item::Item(Archive* owner) {
     }
 }
 
-void Archive::Item::SetName(std::string name) {
+void Item::SetName(std::string name) {
     this->name = name;
 }
 
-std::string Archive::Item::GetName() {
+std::string Item::GetName() {
     return name;
 }
 
-Archive::ItemTypeID Archive::Item::GetType() {
+ItemTypeID Item::GetType() {
     return IRON_ITEM_GENERIC;
 }
 
-void Archive::Item::Pass(std::vector<char> bytes) {}
+void Item::Pass(std::vector<char> bytes) {}
 
 #define DefaultItemImpl(Type) Type::Type() {} Type::Type(Archive* owner) { \
     if(owner != nullptr) { \
@@ -134,7 +148,7 @@ DefaultItemImpl(BoolItem)
 DefaultItemImpl(NumberItem)
 DefaultItemImpl(StringItem)
 
-void ArrayItem::Append(Archive::Item* item) {
+void ArrayItem::Append(Item* item) {
     items.push_back(item);
 }
 
@@ -154,7 +168,7 @@ int ArrayItem::Size() {
     return items.size();
 }
 
-Result<Archive::Item*> ArrayItem::At(int idx) {
+Result<Item*> ArrayItem::At(int idx) {
     if(idx >= Size()) {
         return Failure(IRON_RESULT_TOO_BIG);
     }
