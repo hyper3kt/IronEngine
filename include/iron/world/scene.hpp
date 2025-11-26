@@ -15,7 +15,7 @@ namespace Iron {
         public:
 
         static bool HasScene(const char* path);
-        static Result<Scene> LoadScene(const char* path);
+        static Result<Scene*> LoadScene(const char* path);
 
         Result<Object*> GetObject(int id);
         std::vector<Object*> GetObjectsByName(std::string name);

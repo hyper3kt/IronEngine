@@ -87,7 +87,8 @@ void Engine::Init() {
     }
 
     // The first scene shouldn't explicitly load its state.
-    scene = &attemptLoadDefaultScene.GetValue();
+    scene = attemptLoadDefaultScene.GetValue();
+    scene->BareLoad();
 
     while(!shouldKill) {
         scene->Tick();

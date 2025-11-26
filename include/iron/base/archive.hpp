@@ -1,5 +1,7 @@
 #pragma once
 
+#include "iron/result.hpp"
+
 #include <iostream>
 #include <vector>
 
@@ -33,6 +35,8 @@ namespace Iron {
 
         class Item {
 
+            protected:
+
             Archive* owner;
             std::string name;
 
@@ -42,18 +46,19 @@ namespace Iron {
             Item(Archive* owner);
 
             void SetName(std::string name);
+            std::string GetName();
 
             virtual ItemTypeID GetType();
             virtual void Pass(std::vector<char> bytes);
 
         };
 
-        BoolItem RetrieveBool(std::string name, bool def);
-        NumberItem RetrieveNumber(std::string name, double def);
-        NumberItem RetrieveNumber(std::string name, float def);
-        NumberItem RetrieveNumber(std::string name, int def);
-        StringItem RetrieveString(std::string name, std::string def);
-        ArrayItem RetrieveArray(std::string name);
+        BoolItem* RetrieveBool(std::string name, bool def);
+        NumberItem* RetrieveNumber(std::string name, double def);
+        NumberItem* RetrieveNumber(std::string name, float def);
+        NumberItem* RetrieveNumber(std::string name, int def);
+        StringItem* RetrieveString(std::string name, std::string def);
+        ArrayItem* RetrieveArray(std::string name);
 
         void AttachItem(Item* item);
         void AttachArchive(Archive* archive);
@@ -77,40 +82,60 @@ namespace Iron {
         void Remove(int idx);
         void Pop();
         int Size();
-        Archive::Item* At(int idx);
+        Result<Archive::Item*> At(int idx);
 
     };
 
     class BoolItem : public Archive::Item {
 
+        bool value;
+
         public:
 
         BoolItem();
         BoolItem(Archive* owner);
+        BoolItem(Archive* owner, bool value);
         
         void Pass(std::vector<char> bytes);
+
+        BoolItem& operator=(bool rhs);
+        operator bool();
 
     };
 
     class NumberItem : public Archive::Item {
 
+        double value;
+
         public:
 
         NumberItem();
         NumberItem(Archive* owner);
+        NumberItem(Archive* owner, double value);
 
         void Pass(std::vector<char> bytes);
+
+        NumberItem& operator=(double rhs);
+        operator double();
 
     };
 
     class StringItem : public Archive::Item {
 
+        std::string value;
+
         public:
 
         StringItem();
         StringItem(Archive* owner);
+        StringItem(Archive* owner, std::string value);
 
         void Pass(std::string bytes);
+
+        StringItem& operator=(std::string rhs);
+        operator std::string();
+        operator const char*();
+        
     };
 
 }

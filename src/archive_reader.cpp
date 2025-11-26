@@ -120,6 +120,10 @@ Result<std::vector<Archive::Item*>> ArchiveReader::ReadItems(Archive* owner, boo
         Archive::Item* item;
         auto name = Result<std::string>("");
 
+        if(ReachedEnd()) {
+            return Failure(IRON_RESULT_TOO_BIG);
+        }
+
         if(readStrings) {
             name = ReadString();
 
@@ -166,7 +170,7 @@ Result<std::vector<Archive::Item*>> ArchiveReader::ReadItems(Archive* owner, boo
             }
 
             item = new StringItem(owner);
-            StringItem* ptr = dynamic_cast<StringItem*>(item);
+            StringItem* ptr = static_cast<StringItem*>(item);
             
             if(!ptr) {
                 return Failure(IRON_RESULT_FAILED);
@@ -236,6 +240,10 @@ Result<Archive*> ArchiveReader::ReadArchive(MagicNumbers start, MagicNumbers end
     }
 
     while(!ExpectSingular(IRON_AR_END_SUBENTRIES)) {
+        if(ReachedEnd()) {
+            return Failure(IRON_RESULT_TOO_BIG);
+        }
+        
         auto getArchive = ReadArchive(IRON_AR_BEGIN_SUBENTRY, IRON_AR_END_SUBENTRY);
 
         if(!getArchive.Success()) {
