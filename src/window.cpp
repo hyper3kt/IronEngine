@@ -1,8 +1,6 @@
 #include "iron/base/engine.hpp"
 #include "iron/base/window.hpp"
-#include "iron/config.hpp"
 
-#include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
 #include <glad/glad.h>
 
@@ -48,21 +46,7 @@ bool Window::InitSystem() {
 
     wsm.name = Engine::GetGameName();
 
-    if(config.GetEntryType("version") == IRON_ENTRY_STRING) {
-        wsm.version = config.GetEntry("version").GetValue().data.string;
-    }
-
-    if(config.GetEntryType("appid") == IRON_ENTRY_STRING) {
-        wsm.appId = config.GetEntry("appid").GetValue().data.string;
-    }
-
-    if(config.GetEntryType("developer") == IRON_ENTRY_STRING) {
-        wsm.developer = config.GetEntry("developer").GetValue().data.string;
-    }
-
-    if(config.GetEntryType("copyright") == IRON_ENTRY_STRING) {
-        wsm.copyright = config.GetEntry("copyright").GetValue().data.string;
-    }
+    // TODO
 
     return true;
 }

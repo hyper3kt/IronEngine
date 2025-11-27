@@ -2,10 +2,9 @@
 
 #include "iron/result.hpp"
 
-#include <iostream>
+#include <SDL3/SDL.h>
 
-struct SDL_Window;
-struct SDL_GLContextState* SDL_GLContext;
+#include <iostream>
 
 namespace Iron {
 

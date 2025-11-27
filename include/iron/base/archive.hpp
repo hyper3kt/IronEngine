@@ -18,27 +18,29 @@ namespace Iron {
             IRON_ITEM_GENERIC = 0xD2,
             IRON_ITEM_NUMBER = 0xD3,
             IRON_ITEM_STRING = 0xD4,
-        };
+    };
+
+    class Archive;
 
     class Item {
 
-            protected:
+        protected:
 
-            Archive* owner;
-            std::string name;
+        Archive* owner;
+        std::string name;
 
-            public:
+        public:
 
-            Item();
-            Item(Archive* owner);
+        Item();
+        Item(Archive* owner);
 
-            void SetName(std::string name);
-            std::string GetName();
+        void SetName(std::string name);
+        std::string GetName();
 
-            virtual ItemTypeID GetType();
-            virtual void Pass(std::vector<char> bytes);
+        virtual ItemTypeID GetType();
+        virtual void Pass(std::vector<char> bytes);
 
-        };
+    };
 
     class Archive {
 
@@ -69,6 +71,7 @@ namespace Iron {
         std::string GetType();
 
         void Clean();
+
     };
 
     class ArrayItem : public Item {

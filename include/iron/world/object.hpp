@@ -9,10 +9,15 @@
 
 namespace Iron {
 
-    class Object : public Archive {
+    class Object {
 
+        Archive* archive;
         std::vector<Component*> components;
+
+        protected:
+
         std::vector<Object*> children;
+        Object* parent = nullptr;
 
         public:
 
@@ -25,10 +30,20 @@ namespace Iron {
         template<typename T>
         bool HasComponent();
 
-        void Prepare();
+        Object();
+        Object(Archive* archive);
+
         virtual void Init();
+        std::string GetName();
+        void SetName(std::string name);
+        void SetParent(Object* parent);
+        void AddChild(Object* child);
+        void AddChildren(std::vector<Object*> children);
+        void DeleteChild(std::string name);
         void Orphan();
+        void Orphan(Object* orphan);
         void Delete();
+        Archive* GetArchive();
         virtual void Tick(float dt);
 
         static void DeclareObject(std::string typeName, Object* instance);

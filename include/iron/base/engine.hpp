@@ -1,6 +1,5 @@
 #pragma once
 
-#include "iron/config.hpp"
 #include "iron/result.hpp"
 #include "iron/renderer/renderer.hpp"
 #include "iron/base/window.hpp"
@@ -21,8 +20,6 @@ namespace Iron {
 		static int selectedWindow;
 
 		static std::string gameName;
-		static Config config;
-		static Config settings;
 
 		static bool shouldKill;
 		static bool loadedConfigs;
@@ -39,7 +36,6 @@ namespace Iron {
 
 		static void SetGameName(std::string name);
 		static std::string GetGameName();
-		static Config GetGameConfig();
 
 		static void AddNewObject(ObjectRegistry reg);
 		static std::vector<ObjectRegistry> GetObjectRegistry();

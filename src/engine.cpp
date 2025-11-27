@@ -8,8 +8,6 @@
 
 using namespace Iron;
 
-Config Engine::config = Config("");
-Config Engine::settings = Config("");
 Scene* Engine::scene = new Scene();
 
 int Engine::selectedWindow = 0;
@@ -23,49 +21,12 @@ bool Engine::ShouldUseVulkan() {
     return useVulkan;
 }
 
-Config Engine::GetGameConfig() {
-    return config;
-}
-
 Result<EngineResult> Engine::LoadConfigs(std::string game, std::string settingsPath) {
-    config = Config(game);
-    Result<EngineResult> loadResult = config.Load();
-    
-    if(!loadResult.Success()) {
-        return loadResult;
-    }
-
-    settings = Config(settingsPath);
-    loadResult = settings.Load();
-
-    if(!loadResult.Success()) {
-        settings = Config::CreateDefaultSettings();
-    }
-
-    loadedConfigs = true;
-
-    return IRON_RESULT_OKAY;
+    // TODO
 }
 
 void Engine::Init() {
-    if(!loadedConfigs) {
-        auto attemptLoadConfig = LoadConfigs("./game.ic", "./settings.ic");
-
-        if(!attemptLoadConfig.Success()) {
-            Kill();
-            return;
-        }
-    }
-    
-    if(config.HasEntry("name")) {
-        std::string entry = config.GetEntry("name").GetValue().data.string;
-        gameName = entry;
-    }
-
-    if(!config.HasEntry("default scene")) {
-        Kill();
-        return;
-    }
+    // TODO load configs
 
     Window::InitSystem();
 
@@ -79,7 +40,7 @@ void Engine::Init() {
         renderer = new OpenGLRenderer();
     } else renderer = new VulkanRenderer();
 
-    auto attemptLoadDefaultScene = Scene::LoadScene(config.GetEntry("default scene").GetValue().data.string.c_str());
+    auto attemptLoadDefaultScene = Scene::LoadScene("def.is");
 
     if(!attemptLoadDefaultScene.Success()) {
         Kill();
