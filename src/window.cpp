@@ -42,8 +42,6 @@ bool Window::InitSystem() {
         return false;
     }
 
-    Config config = Engine::GetGameConfig();
-
     wsm.name = Engine::GetGameName();
 
     // TODO
