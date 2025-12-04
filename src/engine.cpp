@@ -62,6 +62,11 @@ void Engine::Init() {
 void Engine::Kill() {
     Window::KillSystem();
     delete renderer;
+    
+    for(int i = 0; i < registry.size(); i++) {
+        ObjectRegistry reg = registry.at(i);
+        delete reg.instance;
+    }
 }
 
 void Engine::SetGameName(std::string name) {

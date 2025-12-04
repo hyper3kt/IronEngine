@@ -46,6 +46,7 @@ namespace Iron {
         Archive* GetArchive();
         virtual void Tick(float dt);
 
+        // TODO: refactor
         static void DeclareObject(std::string typeName, Object* instance);
     };
 
