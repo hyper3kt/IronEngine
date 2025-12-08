@@ -3,6 +3,7 @@
 #include "iron/result.hpp"
 #include "iron/renderer/renderer.hpp"
 #include "iron/base/window.hpp"
+#include "iron/base/config.hpp"
 #include "iron/world/scene.hpp"
 
 #include <iostream>
@@ -14,6 +15,8 @@ namespace Iron {
 
 		static Renderer* renderer;
 		static Scene* scene;
+		static Config gameConfig;
+		static Config settingsConfig;
 		static std::vector<ObjectRegistry> registry;
 
 		static std::vector<Window> windows;

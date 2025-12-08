@@ -26,7 +26,7 @@ namespace Iron {
         };
 
         std::ifstream iaFile;
-        char* archive;
+        char* archive = nullptr;
         int idx = 0;
         int length = 0;
 

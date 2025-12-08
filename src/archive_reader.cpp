@@ -76,6 +76,9 @@ Result<std::string> ArchiveReader::ReadString() {
             return working;
         }
     }
+
+    // No idea how you get here.
+    return Failure(IRON_RESULT_FAILED);
 }
 
 Result<std::vector<char>> ArchiveReader::ReadBytes(int num) {

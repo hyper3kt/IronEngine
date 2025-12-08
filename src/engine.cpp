@@ -2,6 +2,7 @@
 #include "iron/base/window.hpp"
 #include "renderer/vulkan/vulkan_renderer.hpp"
 #include "renderer/opengl/opengl_renderer.hpp"
+#include "iron/base/config.hpp"
 #include "iron/world/scene.hpp"
 
 #include <SDL3/SDL.h>
@@ -9,6 +10,9 @@
 using namespace Iron;
 
 Scene* Engine::scene = new Scene();
+
+Config Engine::gameConfig = Config();
+Config Engine::settingsConfig = Config();
 
 int Engine::selectedWindow = 0;
 
@@ -22,11 +26,32 @@ bool Engine::ShouldUseVulkan() {
 }
 
 Result<EngineResult> Engine::LoadConfigs(std::string game, std::string settingsPath) {
-    // TODO
+    auto loadGame = gameConfig.LoadConfig(game);
+    loadedConfigs = true;
+    
+    if(!loadGame.Success()) {
+        loadedConfigs = false;
+        return Failure(IRON_RESULT_FAILED);
+    }
+
+    auto loadSettings = settingsConfig.LoadConfig(settingsPath);
+
+    if(!loadSettings.Success()) {
+        // TODO: defaults
+    }
+
+    return IRON_RESULT_CREATED;
 }
 
 void Engine::Init() {
-    // TODO load configs
+    if(!loadedConfigs) {
+        auto tryLoad = LoadConfigs("./game.ic", "./settings.ic");
+
+        if(!tryLoad.Success()) {
+            Kill();
+            return;
+        }
+    }
 
     Window::InitSystem();
 
