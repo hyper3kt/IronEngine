@@ -3,11 +3,6 @@
 
 using namespace Iron;
 
-void Object::DeclareObject(std::string typeName, Object* instance) {
-    ObjectRegistry declaration = {typeName, instance};
-    Engine::AddNewObject(declaration);
-}
-
 Object::Object() {
     archive = new Archive();
 }
@@ -24,37 +19,14 @@ void Object::SetName(std::string name) {
     archive->SetName(name);
 }
 
-void Object::Init() {}
-void Object::Tick(float dt) {}
-
-Archive* Object::GetArchive() {
-    return archive;
-}
-
-void Object::Orphan() {
-    if(parent) {
-        parent->Orphan(this);
-    }
-}
-
-void Object::Orphan(Object* child) {
-    for(int i = 0; i < children.size(); i++) {
-        Object* obj = children.at(i);
-
-        if(obj->GetName() == child->GetName()) {
-            children.erase(children.begin() + i);
-            archive->DetachArchive(child->GetArchive());
-            break;
-        }
-    }
-}
-
-void Object::SetParent(Object* parent) {
+void Object::SetParent(ObjectId id) {
     Orphan();
     this->parent = parent;
 }
 
-void Object::AddChild(Object* child) {
+void Object::AddChild(ObjectId id) {
+    DerefObjectId(id, child);
+
     for(int i = 0; children.size(); i++) {
         Object* obj = children.at(i);
 
@@ -68,9 +40,41 @@ void Object::AddChild(Object* child) {
     children.push_back(child);
 }
 
-void Object::AddChildren(std::vector<Object*> children) {
+void Object::AddChildren(std::vector<ObjectId> children) {
     for(int i = 0; i < children.size(); i++) {
         AddChild(children.at(i));
+    }
+}
+
+void Object::OrphanChild(ObjectId id) {
+    DerefObjectId(id, obj);
+
+    for(int i = 0; i < children.size(); i++) {
+        Object* child = children.at(i);
+
+        if(child->GetName() == obj->GetName()) {
+            children.erase(children.begin() + i);
+            archive->DetachArchive(child->GetName());
+            break;
+        }
+    }
+}
+
+void Object::Orphan() {
+    if(parent) {
+        parent->OrphanChild(GetName());
+    }
+}
+
+void Object::DeleteChild(ObjectId id) {
+    DerefObjectId(id, child);
+
+    for(int i = 0; i < children.size(); i++) {
+        Object* obj = children.at(i);
+
+        if(obj->GetName() == child->GetName()) {
+            obj->Delete();
+        }
     }
 }
 
@@ -79,7 +83,7 @@ void Object::Delete() {
 
     for(int i = 0; i < children.size(); i++) {
         Object* child = children.at(i);
-        archive->DetachArchive(child->GetArchive());
+        archive->DetachArchive(child->GetName());
         child->Delete();
     }
 
@@ -92,82 +96,10 @@ void Object::Delete() {
     delete this;
 }
 
-void Object::DeleteChild(std::string name) {
-    for(int i = 0; i < children.size(); i++) {
-        Object* obj = children.at(i);
-
-        if(obj->GetName() == name) {
-            obj->Delete();
-        }
-    }
+Archive* Object::GetArchive() {
+    return archive;
 }
 
-template<typename T>
-bool Object::AttachComponent() {
-    T* comp = new T();
-
-    for(int i = 0; i < components.size(); i++) {
-        Component* child = components.at(i);
-
-        if(comp->GetComponentName() == child->GetComponentName()) {
-            delete comp;
-            return false;
-        }
-    }
-
-    delete comp;
-    components.push_back(comp);
-    return true;
-}
-
-template<typename T>
-bool Object::RemoveComponent() {
-    T* comp = new T();
-
-    for(int i = 0; i < components.size(); i++) {
-        Component* child = components.at(i);
-
-        if(comp->GetComponentName() == child->GetComponentName()) {
-            delete child;
-            delete comp;
-            return true;
-        }
-    }
-
-    delete comp;
-    return false;
-}
-
-template<typename T>
-Result<T*> Object::GetComponent() {
-    T* comp = new T();
-
-    for(int i = 0; i < components.size(); i++) {
-        Component* child = components.at(i);
-
-        if(comp->GetComponentName() == child->GetComponentName()) {
-            delete comp;
-            return child;
-        }
-    }
-
-    delete comp;
-    return Failure(IRON_RESULT_NONEXISTENT_REQUEST);
-}
-
-template<typename T>
-bool Object::HasComponent() {
-    T* comp = new T();
-
-    for(int i = 0; i < components.size(); i++) {
-        Component* child = components.at(i);
-
-        if(comp->GetComponentName() == child->GetComponentName()) {
-            delete comp;
-            return true;
-        }
-    }
-
-    delete comp;
-    return false;
-}
+void Object::Init() {}
+void Object::Tick(float dt) {}
+void Object::FixedTick() {}

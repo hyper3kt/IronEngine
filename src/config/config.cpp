@@ -142,10 +142,10 @@ Result<EngineResult> Config::LoadConfig(std::string path) {
     auto getMap = parser.GetMap(tokens);
 
     if(!getMap.Success()) {
-        return getMap.GetFailure();
+        return getMap.Fail();
     }
 
-    entries = getMap.GetValue();
+    entries = getMap.Value();
 }
 
 Result<Entry*> Config::GetEntry(std::string name, bool createIfNotFound = false) {
@@ -165,7 +165,7 @@ void Config::SetEntry(std::string name, std::vector<std::string> value) {
         return;
     }
 
-    getName.GetValue()->SetEntries(value);
+    getName.Value()->SetEntries(value);
 }
 
 bool Config::HasEntry(std::string name) {

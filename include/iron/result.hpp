@@ -12,7 +12,8 @@ namespace Iron {
         public:
 
         Failure(unsigned int failureCode);
-        Failure(std::string failureReason, unsigned int failureCode);
+        Failure(unsigned int failureCode, std::string failureReason);
+        Failure(std::string failureReason, unsigned int failureCode); // Don't know why I added this in the first place
 
         std::string GetFailureReason();
         unsigned int GetFailureCode();
@@ -28,6 +29,7 @@ namespace Iron {
         IRON_RESULT_NONEXISTENT_REQUEST,
         IRON_RESULT_TOO_BIG, // Just like me
         IRON_RESULT_IMPROPER_FORMAT,
+        IRON_RESULT_LOADED,
     };
 
     template<typename Ok>
@@ -42,8 +44,8 @@ namespace Iron {
         Result(Failure failure);
 
         bool Success();
-        Ok GetValue();
-        Failure GetFailure();
+        Ok Value();
+        Failure Fail();
 
     };
     

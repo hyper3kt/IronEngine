@@ -43,6 +43,44 @@ Result<EngineResult> Engine::LoadConfigs(std::string game, std::string settingsP
     return IRON_RESULT_CREATED;
 }
 
+Scene* Engine::GetScene() {
+    return scene;
+}
+
+Result<EngineResult> Engine::LoadScene(const char* path) {
+    if(!Scene::HasScene(path)) {
+        return Failure(IRON_RESULT_NONEXISTENT_REQUEST);
+    }
+
+    auto loadScene = Scene::LoadScene(path);
+
+    if(!loadScene.Success()) {
+        return loadScene.Fail();
+    }
+
+    scene = loadScene.Value();
+    scene->BareLoad();
+
+    return IRON_RESULT_LOADED;
+}
+
+Result<EngineResult> Engine::LoadSceneFromState(const char* path, const char* savePath) {
+    if(!Scene::HasScene(path)) {
+        return Failure(IRON_RESULT_NONEXISTENT_REQUEST);
+    }
+
+    auto loadScene = Scene::LoadScene(path);
+
+    if(!loadScene.Success()) {
+        return loadScene.Fail();
+    }
+
+    scene = loadScene.Value();
+    scene->FromState(savePath); // will prolly have to give a result eventually tbhon
+
+    return IRON_RESULT_LOADED;
+}
+
 void Engine::Init() {
     if(!loadedConfigs) {
         auto tryLoad = LoadConfigs("./game.ic", "./settings.ic");
@@ -65,16 +103,24 @@ void Engine::Init() {
         renderer = new OpenGLRenderer();
     } else renderer = new VulkanRenderer();
 
-    auto attemptLoadDefaultScene = Scene::LoadScene("def.is");
+    auto sceneName = gameConfig.GetEntry("default-scene", false);
 
-    if(!attemptLoadDefaultScene.Success()) {
+    if(!sceneName.Success()) {
         Kill();
         return;
     }
 
-    // The first scene shouldn't explicitly load its state.
-    scene = attemptLoadDefaultScene.GetValue();
-    scene->BareLoad();
+    auto loadScene = LoadScene(sceneName.Value()->String().c_str());
+
+    if(!loadScene.Success()) {
+        Kill();
+        return;
+    }
+}
+
+void Engine::Ignite() {
+    DefineObjectRelationship("object", new Object())
+    DefineObjectRelationship("iron_camera", new Camera())
 
     while(!shouldKill) {
         scene->Tick();
@@ -88,10 +134,7 @@ void Engine::Kill() {
     Window::KillSystem();
     delete renderer;
     
-    for(int i = 0; i < registry.size(); i++) {
-        ObjectRegistry reg = registry.at(i);
-        delete reg.instance;
-    }
+    
 }
 
 void Engine::SetGameName(std::string name) {
@@ -102,20 +145,18 @@ std::string Engine::GetGameName() {
 	return gameName;
 }
 
-void Engine::AddNewObject(ObjectRegistry reg) {
-    registry.push_back(reg);
+void Engine::AddObjectRelationship(ObjectRelationship or_) {
+    objRelations.push_back(or_);
 }
 
-std::vector<ObjectRegistry> Engine::GetObjectRegistry() {
-    return registry;
+std::vector<ObjectRelationship> Engine::GetObjectRelationships() {
+    return objRelations;
 }
 
-bool Engine::HasObjectRegistered(std::string name) {
-    for(int i = 0; i < registry.size(); i++) {
-        if(registry.at(i).typeName == name) {
-            return true;
-        }
-    }
+void Engine::AddCompRelationship(ComponentRelationship cr) {
+    compRelations.push_back(cr);
+}
 
-    return false;
+std::vector<ComponentRelationship> Engine::GetCompRelationships() {
+    return compRelations;
 }

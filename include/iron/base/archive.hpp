@@ -63,7 +63,7 @@ namespace Iron {
 
         void AttachItem(Item* item);
         void AttachArchive(Archive* archive);
-        void DetachArchive(Archive* archive);
+        void DetachArchive(std::string name);
 
         void SetName(std::string name);
         std::string GetName();

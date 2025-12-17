@@ -9,10 +9,27 @@
 
 namespace Iron {
 
+    class Object;
+
+    class ObjectId {
+
+        Result<Object*> object = Failure(IRON_RESULT_UNINITIALIZED);
+
+        public:
+
+        ObjectId(std::string fromName);
+        ObjectId(Object* fromPtr);
+        ObjectId(int id);
+
+        Result<Object*> Object();
+
+    };
+
     class Object {
 
-        Archive* archive;
+        Archive* archive = nullptr;
         std::vector<Component*> components;
+        int id = 0;
 
         protected:
 
@@ -21,30 +38,30 @@ namespace Iron {
 
         public:
 
-        template<typename T>
-        bool AttachComponent();
-        template<typename T>
-        bool RemoveComponent();
-        template<typename T>
-        Result<T*> GetComponent();
-        template<typename T>
-        bool HasComponent();
-
         Object();
         Object(Archive* archive);
+        Object(ObjectId parent);
+        Object(ObjectId parent, Archive* archive);
 
-        virtual void Init();
+        void AttachComponent(std::string name);
+        void RemoveComponent(std::string name);
+        Component* GetComponent(std::string name);
+        bool HasComponent(std::string name);
+
         std::string GetName();
         void SetName(std::string name);
-        void SetParent(Object* parent);
-        void AddChild(Object* child);
-        void AddChildren(std::vector<Object*> children);
-        void DeleteChild(std::string name);
+        void SetParent(ObjectId id);
+        void AddChild(ObjectId id);
+        void AddChildren(std::vector<ObjectId> children);
         void Orphan();
-        void Orphan(Object* orphan);
+        void OrphanChild(ObjectId id);
         void Delete();
+        void DeleteChild(ObjectId id);
         Archive* GetArchive();
+
+        virtual void Init();
         virtual void Tick(float dt);
+        virtual void FixedTick();
 
         // TODO: refactor
         static void DeclareObject(std::string typeName, Object* instance);
@@ -56,3 +73,5 @@ namespace Iron {
     };
 
 }
+
+#define DerefObjectId(objId, result) auto getObj = objId.Object(); if(!getObj.Success()) return; auto result = getObj.Value()

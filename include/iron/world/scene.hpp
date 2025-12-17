@@ -17,15 +17,13 @@ namespace Iron {
         static bool HasScene(const char* path);
         static Result<Scene*> LoadScene(const char* path);
 
-        Result<Object*> GetObject(int id);
+        Result<Object*> GetObject(ObjectId id);
         std::vector<Object*> GetObjectsByName(std::string name);
-        template<typename T>
-        std::vector<Object*> GetObjectsByComponent();
-        template<typename T>
-        std::vector<T*> GetObjectsByType();
+        std::vector<Object*> GetObjectsByComponent(std::string componentName);
+        std::vector<Object*> GetObjectsByType(std::string typeName);
         
         void AddObject(Object* object);
-        void RemoveObject(int id);
+        void RemoveObject(ObjectId id);
 
         void Tick();
         void Archive();

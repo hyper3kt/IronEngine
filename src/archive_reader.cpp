@@ -103,7 +103,7 @@ Result<ArrayItem*> ArchiveReader::ReadArray(Archive* owner) {
     }
 
     ArrayItem* out = new ArrayItem(owner);
-    auto items = getItems.GetValue();
+    auto items = getItems.Value();
 
     for(int i = 0; i < items.size(); i++) {
         out->Append(items.at(i));
@@ -143,7 +143,7 @@ Result<std::vector<Item*>> ArchiveReader::ReadItems(Archive* owner, bool readStr
                 return Failure(IRON_RESULT_IMPROPER_FORMAT);
             }
 
-            item = getArray.GetValue();
+            item = getArray.Value();
             }
             break;
             case ItemTypeID::IRON_ITEM_BOOL: {
@@ -154,7 +154,7 @@ Result<std::vector<Item*>> ArchiveReader::ReadItems(Archive* owner, bool readStr
             }
 
             item = new BoolItem(owner);
-            item->Pass(getBool.GetValue());
+            item->Pass(getBool.Value());
             }
             break;
             case ItemTypeID::IRON_ITEM_NUMBER: {
@@ -165,7 +165,7 @@ Result<std::vector<Item*>> ArchiveReader::ReadItems(Archive* owner, bool readStr
             }
 
             item = new NumberItem(owner);
-            item->Pass(getNumber.GetValue());
+            item->Pass(getNumber.Value());
             }
             break;
             case ItemTypeID::IRON_ITEM_STRING: {
@@ -182,7 +182,7 @@ Result<std::vector<Item*>> ArchiveReader::ReadItems(Archive* owner, bool readStr
                 return Failure(IRON_RESULT_FAILED);
             }
 
-            ptr->Pass(getString.GetValue());
+            ptr->Pass(getString.Value());
             }
             break;
             default:
@@ -190,7 +190,7 @@ Result<std::vector<Item*>> ArchiveReader::ReadItems(Archive* owner, bool readStr
         }
 
         if(readStrings) {
-            item->SetName(name.GetValue());
+            item->SetName(name.Value());
         }
 
         out.push_back(item);
@@ -212,7 +212,7 @@ Result<Archive*> ArchiveReader::ReadArchive(MagicNumbers start, MagicNumbers end
         return Failure(IRON_RESULT_IMPROPER_FORMAT);
     }
 
-    raw->SetName(getName.GetValue());
+    raw->SetName(getName.Value());
 
     if(!ExpectSingular(IRON_AR_TYPE)) {
         return Failure(IRON_RESULT_IMPROPER_FORMAT);
@@ -224,11 +224,7 @@ Result<Archive*> ArchiveReader::ReadArchive(MagicNumbers start, MagicNumbers end
         return Failure(IRON_RESULT_IMPROPER_FORMAT);
     }
 
-    if(!Engine::HasObjectRegistered(getType.GetValue())) {
-        return Failure(IRON_RESULT_IMPROPER_FORMAT);
-    }
-
-    raw->SetType(getType.GetValue());
+    raw->SetType(getType.Value());
 
     auto getItems = ReadItems(raw, true, IRON_AR_BEGIN_ENTRIES, IRON_AR_END_ENTRIES);
 
@@ -257,7 +253,7 @@ Result<Archive*> ArchiveReader::ReadArchive(MagicNumbers start, MagicNumbers end
             return Failure(IRON_RESULT_IMPROPER_FORMAT);
         }
 
-        raw->AttachArchive(getArchive.GetValue());
+        raw->AttachArchive(getArchive.Value());
     }
 
     if(!ExpectSingular(end)) {
@@ -295,7 +291,7 @@ Result<std::vector<Archive*>> ArchiveReader::LoadRawArchives() {
             return Failure(IRON_RESULT_IMPROPER_FORMAT);
         }
 
-        out.push_back(getArchive.GetValue());
+        out.push_back(getArchive.Value());
     }
     
     free(archive);

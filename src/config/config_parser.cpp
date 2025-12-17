@@ -28,9 +28,7 @@ std::vector<Token> ConfigParser::GetTokens(std::string raw) {
                 out.push_back(Token{CC_TOK_VALUE, value, lines, i});
                 readValue = false;
                 value = "";
-            }
-
-            value += c;
+            } else value += c;
         }
 
         else if(c == '"') {
@@ -147,7 +145,7 @@ Result<std::vector<Token>> Parser::ExpectEntry() {
             );
         }
 
-        auto id = getId.GetValue();
+        auto id = getId.Value();
 
         if(id.type != CC_TOK_ID) {
             return Failure(
@@ -158,7 +156,7 @@ Result<std::vector<Token>> Parser::ExpectEntry() {
 
         idList.push_back(id);
 
-        auto delim = getDelim.GetValue();
+        auto delim = getDelim.Value();
 
         if(delim.type == CC_TOK_SET) {
             return idList;
@@ -187,7 +185,7 @@ Result<std::vector<std::string>> Parser::ExpectValues() {
             );
     }
 
-    auto checkToken = check.GetValue();
+    auto checkToken = check.Value();
 
     if(checkToken.type == CC_TOK_VALUE) {
         Consume();
@@ -218,7 +216,7 @@ Result<std::vector<std::string>> Parser::ExpectValues() {
             return Failure(utilExpectationFailed(utilTokenName(CC_TOK_LIST), "eof"), IRON_RESULT_UNINITIALIZED);
         }
 
-        auto listItem = getListItem.GetValue();
+        auto listItem = getListItem.Value();
 
         if(listItem.type != CC_TOK_LIST) {
             if(listItem.type == CC_TOK_ID) {
@@ -233,7 +231,7 @@ Result<std::vector<std::string>> Parser::ExpectValues() {
                 );
         }
 
-        auto value = getValue.GetValue();
+        auto value = getValue.Value();
 
         if(value.type != CC_TOK_VALUE) {
             return Failure(
@@ -254,20 +252,20 @@ Result<boost::unordered_map<std::string, Entry>> Parser::GetMap(std::vector<Toke
         auto getEntry = ExpectEntry();
 
         if(!getEntry.Success()) {
-            return getEntry.GetFailure();
+            return getEntry.Fail();
         }
 
         auto getValues = ExpectValues();
 
         if(!getValues.Success()) {
-            return getValues.GetFailure();
+            return getValues.Fail();
         }
 
-        auto nameList = getEntry.GetValue();
+        auto nameList = getEntry.Value();
         Token root = nameList.at(0);
 
         if(nameList.size() == 1) {
-            entries[root.value] = Entry(root.value, getValues.GetValue());
+            entries[root.value] = Entry(root.value, getValues.Value());
             continue;
         }
 
@@ -284,10 +282,10 @@ Result<boost::unordered_map<std::string, Entry>> Parser::GetMap(std::vector<Toke
             }
 
             auto getNext = current->SubEntry(sub.value);
-            current = getNext.GetValue();
+            current = getNext.Value();
         }
 
-        current = new Entry(sub.value, getValues.GetValue());
+        current = new Entry(sub.value, getValues.Value());
     }
 
     return entries;

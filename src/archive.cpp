@@ -26,8 +26,14 @@ void Archive::AttachArchive(Archive* archive) {
     childArchives.push_back(archive);
 }
 
-void Archive::DetachArchive(Archive* archive) {
-    // TODO
+void Archive::DetachArchive(std::string name) {
+    for(int i = 0; i < childArchives.size(); i++) {
+        Archive* child = childArchives.at(i);
+
+        if(child->GetName() == name) {
+            childArchives.erase(childArchives.begin() + i);
+        }
+    }
 }
 
 void Archive::Clean() {

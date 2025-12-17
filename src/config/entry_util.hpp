@@ -56,7 +56,7 @@ namespace Iron {
             }
 
             auto getEntry = entry->SubEntry(name);
-            entry = getEntry.GetValue();
+            entry = getEntry.Value();
         }
 
         return entry;

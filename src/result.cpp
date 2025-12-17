@@ -9,6 +9,11 @@ Failure::Failure(unsigned int failureCode) {
     this->failureReason = "";
 }
 
+Failure::Failure(unsigned int failureCode, std::string failureReason) {
+    this->failureCode = failureCode;
+    this->failureReason = failureReason;
+}
+
 Failure::Failure(std::string failureReason, unsigned int failureCode) {
     this->failureCode = failureCode;
     this->failureReason = failureReason;
@@ -41,11 +46,11 @@ bool Result<Ok>::Success() {
 }
 
 template<typename Ok>
-Ok Result<Ok>::GetValue() {
+Ok Result<Ok>::Value() {
     return *success;
 }
 
 template<typename Ok>
-Failure Result<Ok>::GetFailure() {
+Failure Result<Ok>::Fail() {
     return *failure;
 }

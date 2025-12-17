@@ -8,8 +8,19 @@
 
 #include <iostream>
 #include <vector>
+#include <functional>
 
 namespace Iron {
+
+	struct ObjectRelationship {
+		std::string typeName;
+		std::function<Object*()> creator;
+	};
+
+	struct ComponentRelationship {
+		std::string componentName;
+		std::function<Component*()> creator;
+	};
 
 	class Engine {
 
@@ -17,7 +28,6 @@ namespace Iron {
 		static Scene* scene;
 		static Config gameConfig;
 		static Config settingsConfig;
-		static std::vector<ObjectRegistry> registry;
 
 		static std::vector<Window> windows;
 		static int selectedWindow;
@@ -28,24 +38,40 @@ namespace Iron {
 		static bool loadedConfigs;
 		static bool useVulkan;
 
+		static std::vector<ObjectRelationship> objRelations;
+		static std::vector<ComponentRelationship> compRelations;
+
 		Engine();
 
 		public:
-		static void Init();
-		static Result<EngineResult> LoadConfigs(std::string game, std::string settings);
-		static void Kill();
-		
-		static Scene* GetCurrentScene();
 
+		static void Init();
+		static void Ignite();
+		static void Kill();
+		static Result<EngineResult> LoadConfigs(std::string game, std::string settings);
+		
+		static void AddObjectRelationship(ObjectRelationship or_);
+		static std::vector<ObjectRelationship> GetObjectRelationships();
+		static void AddCompRelationship(ComponentRelationship cr);
+		static std::vector<ComponentRelationship> GetCompRelationships();
+		static Scene* GetScene();
+		static Result<EngineResult> LoadScene(const char* path);
+		static Result<EngineResult> LoadSceneFromState(const char* path, const char* savePath);
 		static void SetGameName(std::string name);
 		static std::string GetGameName();
-
-		static void AddNewObject(ObjectRegistry reg);
-		static std::vector<ObjectRegistry> GetObjectRegistry();
-		static bool HasObjectRegistered(std::string name);
 
 		static bool ShouldUseVulkan();
 
 	};
 
 }
+
+#define DefineObjectRelationship(name, value) { struct ObjectRelationship or_; \
+	or_.typeName = name; \
+	or_.creator = []() { return value; }; \
+	Engine::AddObjectRelationship(or_); }
+
+#define DefineCompRelationship(name, value) { struct ComponentRelationship cr; \
+	cr.typeName = name; \
+	cr.creator = []() { return value; }; \
+	Engine::AddCompRelationship(cr); }
