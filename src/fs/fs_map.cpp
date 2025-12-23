@@ -1,4 +1,4 @@
-#include "fs_map.hpp"
+#include "iron/fs/fs_map.hpp"
 
 #if defined(__linux__) || defined(LINUX) || defined(__unix__) || defined(UNIX)
 #define Linux
@@ -97,15 +97,28 @@ char* Map::Get() {
     return map;
 }
 
-char Map::Get(int i) {
-    return map[i];
+size_t Map::GetCharsConsumed() {
+    return consumed;
 }
 
-bool Map::Set(int i, char c) {
-    if(!Valid() || perms == IRON_MAP_READ || Size() <= i) {
-        return false;
+Result<char> Map::Peek() {
+    if(consumed >= Size()) {
+        return Failure(IRON_RESULT_TOO_BIG);
     }
 
-    map[i] = c;
-    return true;
+    return map[consumed];
+}
+
+Result<char> Map::Consume() {
+    if(consumed >= Size()) {
+        return Failure(IRON_RESULT_TOO_BIG);
+    }
+
+    return map[consumed++];
+}
+
+void Map::Rewind() {
+    if(consumed > 0) {
+        consumed--;
+    }
 }
