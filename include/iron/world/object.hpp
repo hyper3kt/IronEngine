@@ -21,7 +21,7 @@ namespace Iron {
         ObjectId(Object* fromPtr);
         ObjectId(int id);
 
-        Result<Object*> Object();
+        Result<Object*> GetObject();
 
     };
 

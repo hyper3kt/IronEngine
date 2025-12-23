@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 4.0)
 project(Iron VERSION 0.1.0 LANGUAGES CXX DESCRIPTION "Open source and easy to use 3D game engine.")
 set(CXX_STANDARD 20)
 set(CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(IRON_DIR ${Iron_SOURCE_DIR})
 set(IRON_SRC_DIR ${IRON_DIR}/src)
@@ -40,7 +41,7 @@ file(GLOB IRON_SOURCE ${IRON_DIR}/src/*.cpp)
 file(GLOB IRON_PRIVATE_HEADERS ${IRON_DIR}/src/*.hpp)
 set(IRON_INCLUDE ${IRON_DIR}/include/)
 
-add_library(IronEngine STATIC ${IRON_SOURCE} ${IRON_PRIVATE_HEADERS})
+add_library(IronEngine SHARED ${IRON_SOURCE} ${IRON_PRIVATE_HEADERS})
 
 target_include_directories(IronEngine PUBLIC ${IRON_INCLUDE})
 target_include_directories(IronEngine PRIVATE 
