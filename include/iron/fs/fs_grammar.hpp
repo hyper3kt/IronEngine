@@ -78,7 +78,7 @@ namespace Iron {
 
             Result<Bin> ReadBin();
             Result<Element> ReadElement(int bin);
-            Result<Element> ReadCompositeElement(int elem, int bin);
+            Result<Element> ReadElement(ElemExp elem);
             Result<std::vector<uchar>> ReadBytes(int num);
             ApparentID PeekType(unsigned int bin);
 

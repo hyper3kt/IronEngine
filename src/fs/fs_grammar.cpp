@@ -162,18 +162,22 @@ Result<Element> Grammar::ReadElement(int bin) {
         return Failure(IRON_RESULT_IMPROPER_FORMAT);
     }
 
+    return ReadElement(rule);
+}
+
+Result<Element> Grammar::ReadElement(ElemExp elem) {
     Element element;
-    element.type = rule.type;
+    element.type = elem.type;
 
-    if(rule.composed == true) {
-        for(int i = 0; i < rule.composition.size(); i++) {
-            auto comp = ReadCompositeElement(id, bin);
+    if(elem.composed == true) {
+        for(int i = 0; i < elem.composition.size(); i++) {
+            auto getElement = ReadElement(elem);
 
-            if(!comp.Success()) {
-                return comp.Fail();
+            if(!getElement.Success()) {
+                return getElement.Fail();
             }
 
-            element.composites.push_back(comp.Value());
+            element.composites.push_back(getElement.Value());
         }
 
         return element;
@@ -181,7 +185,7 @@ Result<Element> Grammar::ReadElement(int bin) {
 
     unsigned int numBytes = READ_STRING;
 
-    if(rule.dataType == IRON_GRAMMAR_VAR_SIZE) {
+    if(elem.dataType == IRON_GRAMMAR_VAR_SIZE) {
         auto getNumBytes = map->Consume();
 
         if(!getNumBytes.Success()) {
@@ -191,12 +195,12 @@ Result<Element> Grammar::ReadElement(int bin) {
         numBytes = getNumBytes.Value();
     }
 
-    else if(rule.dataType == IRON_GRAMMAR_BYTE) {
+    else if(elem.dataType == IRON_GRAMMAR_BYTE) {
         numBytes = 1;
     }
 
-    else if(rule.dataType == IRON_GRAMMAR_BYTES) {
-        numBytes = rule.minBytes;
+    else if(elem.dataType == IRON_GRAMMAR_BYTES) {
+        numBytes = elem.minBytes;
     }
 
     auto getBytes = ReadBytes(numBytes);
@@ -208,10 +212,6 @@ Result<Element> Grammar::ReadElement(int bin) {
     element.data = getBytes.Value();
 
     return element;
-}
-
-Result<Element> Grammar::ReadCompositeElement(int elem, int bin) {
-    
 }
 
 Result<std::vector<uchar>> Grammar::ReadBytes(int num) {
