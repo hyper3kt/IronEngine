@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 4.0)
 project(Iron VERSION 0.1.0 LANGUAGES CXX DESCRIPTION "Open source and easy to use 3D game engine.")
 set(CXX_STANDARD 20)
 set(CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(IRON_DIR ${Iron_SOURCE_DIR})
 set(IRON_SRC_DIR ${IRON_DIR}/src)
