@@ -41,7 +41,7 @@ file(GLOB IRON_SOURCE ${IRON_DIR}/src/*.cpp)
 file(GLOB IRON_PRIVATE_HEADERS ${IRON_DIR}/src/*.hpp)
 set(IRON_INCLUDE ${IRON_DIR}/include/)
 
-add_library(IronEngine STATIC ${IRON_SOURCE} ${IRON_PRIVATE_HEADERS})
+add_library(IronEngine SHARED ${IRON_SOURCE} ${IRON_PRIVATE_HEADERS})
 
 target_include_directories(IronEngine PUBLIC ${IRON_INCLUDE})
 target_include_directories(IronEngine PRIVATE 
