@@ -1,10 +1,12 @@
 #pragma once
 
+#include "iron/macros.hpp"
+
 #include <iostream>
 
 namespace Iron {
 
-    class Failure {
+    class IronDLL Failure {
 
         std::string failureReason = "";
         unsigned int failureCode;
@@ -48,7 +50,7 @@ namespace Iron {
     };
 
     template<typename Ok>
-    class Result {
+    class IronDLL Result {
 
         Ok* success = nullptr;
         Failure* failure = nullptr;

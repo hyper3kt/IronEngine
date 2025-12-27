@@ -2,6 +2,7 @@
 
 #include "iron/result.hpp"
 #include "iron/base/entry.hpp"
+#include "iron/macros.hpp"
 
 #include <iostream>
 #include <vector>
@@ -10,7 +11,7 @@
 
 namespace Iron {
 
-    class Config {
+    class IronDLL Config {
 
         boost::unordered_map<std::string, Entry> entries;
 

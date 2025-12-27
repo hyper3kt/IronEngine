@@ -5,6 +5,7 @@
 #include "iron/base/window.hpp"
 #include "iron/base/config.hpp"
 #include "iron/world/scene.hpp"
+#include "iron/macros.hpp"
 
 #include <iostream>
 #include <vector>
@@ -12,17 +13,17 @@
 
 namespace Iron {
 
-	struct ObjectRelationship {
+	struct IronDLL ObjectRelationship {
 		std::string typeName;
 		std::function<Object*()> creator;
 	};
 
-	struct ComponentRelationship {
+	struct IronDLL ComponentRelationship {
 		std::string componentName;
 		std::function<Component*()> creator;
 	};
 
-	class Engine {
+	class IronDLL Engine {
 
 		static Renderer* renderer;
 		static Scene* scene;

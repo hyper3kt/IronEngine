@@ -3,6 +3,7 @@
 #include "iron/base/component.hpp"
 #include "iron/base/archive.hpp"
 #include "iron/result.hpp"
+#include "iron/macros.hpp"
 
 #include <iostream>
 #include <vector>
@@ -11,7 +12,7 @@ namespace Iron {
 
     class Object;
 
-    class ObjectId {
+    class IronDLL ObjectId {
 
         Result<Object*> object = Failure(IRON_RESULT_UNINITIALIZED);
 
@@ -25,7 +26,7 @@ namespace Iron {
 
     };
 
-    class Object {
+    class IronDLL Object {
 
         Archive* archive = nullptr;
         std::vector<Component*> components;
@@ -67,7 +68,7 @@ namespace Iron {
         static void DeclareObject(std::string typeName, Object* instance);
     };
 
-    struct ObjectRegistry {
+    struct IronDLL ObjectRegistry {
         std::string typeName;
         Object* instance;
     };

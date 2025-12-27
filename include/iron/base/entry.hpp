@@ -1,13 +1,14 @@
 #pragma once
 
 #include "iron/result.hpp"
+#include "iron/macros.hpp"
 
 #include <iostream>
 #include <vector>
 
 namespace Iron {
 
-    class Entry {
+    class IronDLL Entry {
 
         std::string name;
         std::vector<std::string> entries;

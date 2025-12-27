@@ -2,6 +2,7 @@
 
 #include "iron/result.hpp"
 #include "iron/fs/fs_map.hpp"
+#include "iron/macros.hpp"
 
 #include <iostream>
 #include <vector>
@@ -20,7 +21,7 @@ namespace Iron {
             IRON_GRAMMAR_COMPOSED,
         };
 
-        typedef struct _ElemExp {
+        typedef struct IronDLL _ElemExp {
             unsigned int type;
             GrammarTypes dataType = IRON_GRAMMAR_STRING;
             bool composed = false;
@@ -29,24 +30,24 @@ namespace Iron {
             std::vector<struct _ElemExp> composition;
         } ElemExp;
 
-        typedef struct {
+        typedef struct IronDLL _BinExp{
             unsigned int binType;
         } BinExp;
 
-        typedef struct _Element {
+        typedef struct IronDLL _Element {
             unsigned int type;
             GrammarTypes internalType;
             std::vector<uchar> data;
             std::vector<struct _Element> composites;
         } Element;
 
-        typedef struct _Bin {
+        typedef struct IronDLL _Bin {
             unsigned int type;
             std::vector<struct _Element> elements;
             std::vector<struct _Bin> bins;
         } Bin;
 
-        class Grammar {
+        class IronDLL Grammar {
 
             typedef struct {
                 unsigned int type;

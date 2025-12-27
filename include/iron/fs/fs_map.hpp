@@ -1,6 +1,7 @@
 #pragma once
 
 #include "iron/result.hpp"
+#include "iron/macros.hpp"
 
 #include <iostream>
 
@@ -13,7 +14,7 @@ namespace Iron {
             IRON_MAP_READWRITE,
         };
 
-        class Map {
+        class IronDLL Map {
 
             char* map;
             void* fileHandle = nullptr;

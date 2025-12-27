@@ -4,7 +4,7 @@
 
 namespace Iron {
 
-    class Camera : public Object {
+    class IronDLL Camera : public Object {
 
     };
     

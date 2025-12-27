@@ -8,7 +8,7 @@
 
 namespace Iron {
 
-    class Scene {
+    class IronDLL Scene {
 
         std::vector<Object*> objects;
 

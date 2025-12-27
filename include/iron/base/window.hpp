@@ -1,6 +1,7 @@
 #pragma once
 
 #include "iron/result.hpp"
+#include "iron/macros.hpp"
 
 #include <SDL3/SDL.h>
 
@@ -8,7 +9,7 @@
 
 namespace Iron {
 
-    struct WindowSystemMetadata {
+    struct IronDLL WindowSystemMetadata {
         std::string name = "Iron Engine";
         std::string version = "v1.0.0";
         std::string appId = "com.ironengine.game";
@@ -16,7 +17,7 @@ namespace Iron {
         std::string copyright = "All rights reserved (c)";
     };
 
-    class Window {
+    class IronDLL Window {
 
         static WindowSystemMetadata wsm;
         SDL_Window* window;

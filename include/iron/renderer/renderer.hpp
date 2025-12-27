@@ -1,10 +1,11 @@
 #pragma once
 
 #include "iron/world/camera.hpp"
+#include "iron/macros.hpp"
 
 namespace Iron {
 
-    class Renderer {
+    class IronDLL Renderer {
 
         Camera* camera;
 

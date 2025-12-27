@@ -1,6 +1,7 @@
 #pragma once
 
 #include "iron/result.hpp"
+#include "iron/macros.hpp"
 
 #include <iostream>
 #include <vector>
@@ -22,7 +23,7 @@ namespace Iron {
 
     class Archive;
 
-    class Item {
+    class IronDLL Item {
 
         protected:
 
@@ -42,7 +43,7 @@ namespace Iron {
 
     };
 
-    class Archive {
+    class IronDLL Archive {
 
         bool isChildArchive = false;
         std::vector<Archive*> childArchives;
@@ -72,7 +73,7 @@ namespace Iron {
 
     };
 
-    class ArrayItem : public Item {
+    class IronDLL ArrayItem : public Item {
 
         std::vector<Item*> items;
 
@@ -89,7 +90,7 @@ namespace Iron {
 
     };
 
-    class BoolItem : public Item {
+    class IronDLL BoolItem : public Item {
 
         bool value;
 
@@ -106,7 +107,7 @@ namespace Iron {
 
     };
 
-    class NumberItem : public Item {
+    class IronDLL NumberItem : public Item {
 
         double value;
 
@@ -123,7 +124,7 @@ namespace Iron {
 
     };
 
-    class StringItem : public Item {
+    class IronDLL StringItem : public Item {
 
         std::string value;
 

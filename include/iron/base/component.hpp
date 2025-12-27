@@ -1,10 +1,12 @@
 #pragma once
 
+#include "iron/macros.hpp"
+
 #include <iostream>
 
 namespace Iron {
 
-    class Component {
+    class IronDLL Component {
 
         public:
 

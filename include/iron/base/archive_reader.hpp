@@ -2,13 +2,14 @@
 
 #include "iron/base/archive.hpp"
 #include "iron/result.hpp"
+#include "iron/macros.hpp"
 
 #include <iostream>
 #include <fstream>
 
 namespace Iron {
 
-    class ArchiveReader {
+    class IronDLL ArchiveReader {
 
         enum MagicNumbers {
             IRON_AR_END_STRING = 0x00,
