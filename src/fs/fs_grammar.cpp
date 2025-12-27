@@ -1,4 +1,5 @@
 #include "iron/fs/fs_grammar.hpp"
+#include "iron/result.hpp"
 
 using namespace Iron;
 using namespace FileSystem;
@@ -42,7 +43,7 @@ int Grammar::GetElementId(unsigned int elem, bool createIfNotFound) {
     return GRAMMAR_NO_ID;
 }
 
-void Grammar::SetMagic(unsigned int magic...) {
+void Grammar::SetMagic(uchar magic...) {
     this->magic.clear();
     this->magic.insert(this->magic.begin(), magic);
 }
@@ -168,6 +169,7 @@ Result<Element> Grammar::ReadElement(int bin) {
 Result<Element> Grammar::ReadElement(ElemExp elem) {
     Element element;
     element.type = elem.type;
+    element.internalType = elem.dataType;
 
     if(elem.composed == true) {
         for(int i = 0; i < elem.composition.size(); i++) {
@@ -280,37 +282,85 @@ Grammar::ApparentID Grammar::PeekType(unsigned int bin) {
     return GRAMMAR_INV;
 }
 
-ElemExp Grammar::ElementExpectation(unsigned int type, GrammarTypes dataType, bool required, bool unique) {
+std::vector<uchar> Grammar::SerializeElement(Element element) {
+    std::vector<uchar> out;
+    out.push_back(element.type);
+
+    if(element.internalType == IRON_GRAMMAR_COMPOSED) {
+        for(int i = 0; i < element.composites.size(); i++) {
+            auto chars = SerializeElement(element.composites.at(i));
+            out.insert(out.end(), chars.begin(), chars.end());
+        }
+
+        return out;
+    }
+
+    if(element.internalType == IRON_GRAMMAR_VAR_SIZE) {
+        out.push_back(element.data.size());
+    }
+
+    out.insert(out.end(), element.data.begin(), element.data.end());
+    
+    return out;
+}
+
+std::vector<uchar> Grammar::Serialize(std::vector<Bin> bins) {
+    std::vector<uchar> out;
+    out.insert(out.begin(), magic.begin(), magic.end());
+
+    for(int i = 0; i < bins.size(); i++) {
+        Bin bin = bins.at(i);
+        auto elements = bin.elements;
+
+        out.push_back(bin.type);
+
+        for(int j = 0; j < elements.size(); j++) {
+            auto element = elements.at(i);
+            auto chars = SerializeElement(element);
+
+            out.insert(out.end(), chars.begin(), chars.end());
+        }
+
+        if(!bin.bins.size()) {
+            auto subBins = Serialize(bin.bins);
+            out.insert(out.end(), subBins.begin(), subBins.end());
+        }
+
+        out.insert(out.end(), bin.type);
+    }
+    
+    return out;
+}
+
+ElemExp Grammar::ElementExpectation(unsigned int type, GrammarTypes dataType) {
     ElemExp exp;
     exp.type = type;
     exp.dataType = dataType;
-    exp.required = required;
-    exp.unique = unique;
     return exp;
 }
 
-ElemExp Grammar::ElementExpectation(unsigned int type, GrammarTypes dataType, int byteCount, bool required, bool unique) {
-    auto exp = ElementExpectation(type, dataType, required, unique);
+ElemExp Grammar::ElementExpectation(unsigned int type, GrammarTypes dataType, int byteCount) {
+    auto exp = ElementExpectation(type, dataType);
     exp.minBytes = byteCount;
     exp.maxBytes = byteCount;
     return exp;
 }
 
-ElemExp Grammar::ElementExpectation(unsigned int type, GrammarTypes dataType, int minBytes, int maxBytes, bool required, bool unique) {
-    auto exp = ElementExpectation(type, dataType, minBytes, required, unique);
+ElemExp Grammar::ElementExpectation(unsigned int type, GrammarTypes dataType, int minBytes, int maxBytes) {
+    auto exp = ElementExpectation(type, dataType, minBytes);
     exp.maxBytes = maxBytes;
     return exp;
 }
 
-ElemExp Grammar::ElementExpectation(unsigned int type, bool required, bool unique, int numComposites, ElemExp composites[]) {
-    auto exp = ElementExpectation(type, IRON_GRAMMAR_COMPOSED, required, unique);
+ElemExp Grammar::ElementExpectation(unsigned int type, int numComposites, ElemExp composites[]) {
+    auto exp = ElementExpectation(type, IRON_GRAMMAR_COMPOSED);
     exp.composed = true;
     exp.composition.insert(exp.composition.begin(), composites, composites + numComposites);
     return exp;
 }
 
-BinExp Grammar::BinExpectation(unsigned int type, bool required, bool unique) {
-    BinExp exp = {type, required, unique};
+BinExp Grammar::BinExpectation(unsigned int type) {
+    BinExp exp = {type};
     return exp;
 }
 

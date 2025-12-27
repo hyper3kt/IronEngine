@@ -20,33 +20,30 @@ namespace Iron {
             IRON_GRAMMAR_COMPOSED,
         };
 
-        typedef struct {
+        typedef struct _ElemExp {
             unsigned int type;
             GrammarTypes dataType = IRON_GRAMMAR_STRING;
-            bool required = false;
-            bool unique = false;
             bool composed = false;
             int minBytes = 0;
             int maxBytes = 0;
-            std::vector<ElemExp> composition;
+            std::vector<struct _ElemExp> composition;
         } ElemExp;
 
         typedef struct {
             unsigned int binType;
-            bool required = false;
-            bool unique = false;
         } BinExp;
 
-        typedef struct {
+        typedef struct _Element {
             unsigned int type;
+            GrammarTypes internalType;
             std::vector<uchar> data;
-            std::vector<Element> composites;
+            std::vector<struct _Element> composites;
         } Element;
 
-        typedef struct {
+        typedef struct _Bin {
             unsigned int type;
-            std::vector<Element> elements;
-            std::vector<Bin> bins;
+            std::vector<struct _Element> elements;
+            std::vector<struct _Bin> bins;
         } Bin;
 
         class Grammar {
@@ -70,7 +67,7 @@ namespace Iron {
 
             std::vector<InternalBin> internalBins;
             std::vector<InternalElem> internalElems;
-            std::vector<int> magic;
+            std::vector<uchar> magic;
             Map* map;
 
             int GetSequentialId(unsigned int bin, bool createIfNotFound);
@@ -82,18 +79,20 @@ namespace Iron {
             Result<std::vector<uchar>> ReadBytes(int num);
             ApparentID PeekType(unsigned int bin);
 
+            std::vector<uchar> SerializeElement(Element element);
+
             protected:
 
-            void SetMagic(unsigned int magic...);
+            void SetMagic(uchar magic...);
             Result<EngineResult> Parse(Map* map);
             std::vector<uchar> Serialize(std::vector<Bin> bins);
 
-            ElemExp ElementExpectation(unsigned int type, GrammarTypes dataType, bool required, bool unique);
-            ElemExp ElementExpectation(unsigned int type, GrammarTypes dataType, int byteCount, bool required, bool unique);
-            ElemExp ElementExpectation(unsigned int type, GrammarTypes dataType, int minBytes, int maxBytes, bool required, bool unique);
-            ElemExp ElementExpectation(unsigned int type, bool required, bool unique, int numComposites, ElemExp composites[]);
+            ElemExp ElementExpectation(unsigned int type, GrammarTypes dataType);
+            ElemExp ElementExpectation(unsigned int type, GrammarTypes dataType, int byteCount);
+            ElemExp ElementExpectation(unsigned int type, GrammarTypes dataType, int minBytes, int maxBytes);
+            ElemExp ElementExpectation(unsigned int type, int numComposites, ElemExp composites[]);
 
-            BinExp BinExpectation(unsigned int type, bool required, bool unique);
+            BinExp BinExpectation(unsigned int type);
 
             void DefineBinElements(unsigned int bin, int numElems, ElemExp elems[]);
             void DefineSubBins(unsigned int bin, int numBins, BinExp subBins[]);
