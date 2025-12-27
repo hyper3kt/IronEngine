@@ -70,7 +70,7 @@ namespace Iron {
         inline Ok Value() {
             return *success;
         };
-        Failure Fail() {
+        inline Failure Fail() {
             return *failure;
         };
 
