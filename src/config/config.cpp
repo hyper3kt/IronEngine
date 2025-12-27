@@ -1,10 +1,11 @@
 #include "iron/base/config.hpp"
 #include "config_parser.hpp"
 #include "entry_util.hpp"
-
-#include <boost/filesystem/fstream.hpp>
+#include "iron/fs/fs_map.hpp"
 
 using namespace Iron;
+
+Entry::Entry() {}
 
 Entry::Entry(std::string name, std::string value) {
     this->name = name;
@@ -124,19 +125,15 @@ Entry::operator std::vector<std::string>() {
 }
 
 Result<EngineResult> Config::LoadConfig(std::string path) {
-    boost::filesystem::ifstream file(path);
+    FileSystem::Map fileMap = FileSystem::Map(path.c_str(), FileSystem::IRON_MAP_READ);
 
-    if(file.bad()) {
+    if(!fileMap.Valid()) {
         return Failure(IRON_RESULT_NONEXISTENT_FILE);
     }
 
     std::string line;
-    std::vector<ConfigParser::Token> tokens;
-
-    while(std::getline(file, line)) {
-        auto newTokens = ConfigParser::GetTokens(line);
-        tokens.insert(tokens.end(), newTokens.begin(), newTokens.end());
-    }
+    std::vector<ConfigParser::Token> tokens = ConfigParser::GetTokens(fileMap.Get());
+    fileMap.Close();
 
     ConfigParser::Parser parser;
     auto getMap = parser.GetMap(tokens);
@@ -146,6 +143,8 @@ Result<EngineResult> Config::LoadConfig(std::string path) {
     }
 
     entries = getMap.Value();
+    
+    return IRON_RESULT_LOADED;
 }
 
 Result<Entry*> Config::GetEntry(std::string name, bool createIfNotFound = false) {
@@ -153,9 +152,13 @@ Result<Entry*> Config::GetEntry(std::string name, bool createIfNotFound = false)
 }
 
 void Config::SetEntry(std::string name, std::string value) {
-    std::vector<std::string> vec;
-    vec.push_back(value);
-    SetEntry(name, value);
+    auto getName = utilFindEntryFromMap(&entries, name, true);
+
+    if(!getName.Success()) {
+        return;
+    }
+
+    getName.Value()->SetEntries(value);
 }
 
 void Config::SetEntry(std::string name, std::vector<std::string> value) {

@@ -10,6 +10,7 @@
 using namespace Iron;
 
 Scene* Engine::scene = new Scene();
+Renderer* Engine::renderer;
 
 Config Engine::gameConfig = Config();
 Config Engine::settingsConfig = Config();
@@ -20,6 +21,9 @@ std::string Engine::gameName = "Iron Engine";
 bool Engine::shouldKill = false;
 bool Engine::loadedConfigs = false;
 bool Engine::useVulkan = false;
+
+std::vector<ObjectRelationship> Engine::objRelations;
+std::vector<ComponentRelationship> Engine::compRelations;
 
 bool Engine::ShouldUseVulkan() {
     return useVulkan;
@@ -48,7 +52,7 @@ Scene* Engine::GetScene() {
 }
 
 Result<EngineResult> Engine::LoadScene(const char* path) {
-    if(!Scene::HasScene(path)) {
+    /*if(!Scene::HasScene(path)) {
         return Failure(IRON_RESULT_NONEXISTENT_REQUEST);
     }
 
@@ -59,13 +63,13 @@ Result<EngineResult> Engine::LoadScene(const char* path) {
     }
 
     scene = loadScene.Value();
-    scene->BareLoad();
+    scene->BareLoad();*/
 
     return IRON_RESULT_LOADED;
 }
 
 Result<EngineResult> Engine::LoadSceneFromState(const char* path, const char* savePath) {
-    if(!Scene::HasScene(path)) {
+    /*if(!Scene::HasScene(path)) {
         return Failure(IRON_RESULT_NONEXISTENT_REQUEST);
     }
 
@@ -76,7 +80,7 @@ Result<EngineResult> Engine::LoadSceneFromState(const char* path, const char* sa
     }
 
     scene = loadScene.Value();
-    scene->FromState(savePath); // will prolly have to give a result eventually tbhon
+    scene->FromState(savePath);*/
 
     return IRON_RESULT_LOADED;
 }
@@ -123,8 +127,7 @@ void Engine::Ignite() {
     DefineObjectRelationship("iron_camera", new Camera())
 
     while(!shouldKill) {
-        scene->Tick();
-        renderer->Tick();
+
     }
 
     Kill();

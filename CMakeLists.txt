@@ -37,11 +37,11 @@ endif()
 
 find_package(Boost REQUIRED)
 
-file(GLOB IRON_SOURCE ${IRON_DIR}/src/*.cpp)
-file(GLOB IRON_PRIVATE_HEADERS ${IRON_DIR}/src/*.hpp)
+file(GLOB_RECURSE IRON_SOURCE ${IRON_DIR}/src/*.cpp)
+file(GLOB_RECURSE IRON_PRIVATE_HEADERS ${IRON_DIR}/src/*.hpp)
 set(IRON_INCLUDE ${IRON_DIR}/include/)
 
-add_library(IronEngine SHARED ${IRON_SOURCE} ${IRON_PRIVATE_HEADERS})
+add_library(IronEngine SHARED ${IRON_SOURCE} ${IRON_PRIVATE_HEADERS} ${IRON_LIB_DIR}/glad/src/glad.c)
 
 target_include_directories(IronEngine PUBLIC ${IRON_INCLUDE})
 target_include_directories(IronEngine PRIVATE 
@@ -50,7 +50,6 @@ target_include_directories(IronEngine PRIVATE
     ${SDL3_INCLUDE_DIRS}
     ${IRON_LIB_DIR}/glad/include
 )
-target_sources(IronEngine PRIVATE ${IRON_LIB_DIR}/glad/src)
 target_link_libraries(IronEngine PRIVATE 
     Boost::boost
     SDL3::SDL3

@@ -74,4 +74,4 @@ namespace Iron {
 
 }
 
-#define DerefObjectId(objId, result) auto getObj = objId.Object(); if(!getObj.Success()) return; auto result = getObj.Value()
+#define DerefObjectId(objId, result) auto getObj = objId.GetObject(); if(!getObj.Success()) return; auto result = getObj.Value()

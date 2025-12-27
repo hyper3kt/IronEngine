@@ -3,6 +3,14 @@
 
 using namespace Iron;
 
+Result<Object*> ObjectId::GetObject() {
+    return object;
+}
+
+ObjectId::ObjectId(Object* fromPtr) {
+	object = fromPtr;
+}
+
 Object::Object() {
     archive = new Archive();
 }
@@ -62,7 +70,7 @@ void Object::OrphanChild(ObjectId id) {
 
 void Object::Orphan() {
     if(parent) {
-        parent->OrphanChild(GetName());
+        parent->OrphanChild(this);
     }
 }
 

@@ -15,6 +15,7 @@ namespace Iron {
 
         public:
 
+        Entry();
         Entry(std::string name, std::string value);
         Entry(std::string name, std::vector<std::string> values);
         

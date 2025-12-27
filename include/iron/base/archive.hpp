@@ -52,8 +52,6 @@ namespace Iron {
 
         public:
 
-        Archive();
-
         BoolItem* RetrieveBool(std::string name, bool def);
         NumberItem* RetrieveNumber(std::string name, double def);
         NumberItem* RetrieveNumber(std::string name, float def);

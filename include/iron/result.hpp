@@ -6,17 +6,32 @@ namespace Iron {
 
     class Failure {
 
-        std::string failureReason;
+        std::string failureReason = "";
         unsigned int failureCode;
 
         public:
 
-        Failure(unsigned int failureCode);
-        Failure(unsigned int failureCode, std::string failureReason);
-        Failure(std::string failureReason, unsigned int failureCode); // Don't know why I added this in the first place
+        inline Failure(unsigned int failureCode) {
+            this->failureCode = failureCode;
+        };
 
-        std::string GetFailureReason();
-        unsigned int GetFailureCode();
+        inline Failure(unsigned int failureCode, std::string failureReason) {
+            this->failureCode = failureCode;
+            this->failureReason = failureReason;
+        };
+
+        inline Failure(std::string failureReason, unsigned int failureCode) {
+            this->failureCode = failureCode;
+            this->failureReason = failureReason;
+        }
+
+        inline std::string GetFailureReason() {
+            return failureReason;
+        };
+
+        inline unsigned int GetFailureCode() {
+            return failureCode;
+        };
 
     };
 
@@ -27,7 +42,7 @@ namespace Iron {
         IRON_RESULT_FAILED,
         IRON_RESULT_NONEXISTENT_FILE,
         IRON_RESULT_NONEXISTENT_REQUEST,
-        IRON_RESULT_TOO_BIG, // Just like me
+        IRON_RESULT_TOO_BIG,
         IRON_RESULT_IMPROPER_FORMAT,
         IRON_RESULT_LOADED,
     };
@@ -40,12 +55,24 @@ namespace Iron {
 
         public:
 
-        Result(Ok success);
-        Result(Failure failure);
+        inline Result(Ok success) {
+            this->success = &success;
+        };
 
-        bool Success();
-        Ok Value();
-        Failure Fail();
+        inline Result(Failure failure) {
+            this->failure = &failure;
+        };
+
+        inline bool Success() {
+            return success != nullptr && failure == nullptr;
+        };
+
+        inline Ok Value() {
+            return *success;
+        };
+        Failure Fail() {
+            return *failure;
+        };
 
     };
     
