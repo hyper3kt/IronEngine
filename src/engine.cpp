@@ -123,8 +123,8 @@ void Engine::Init() {
 }
 
 void Engine::Ignite() {
-    DefineObjectRelationship("object", new Object())
-    DefineObjectRelationship("iron_camera", new Camera())
+    DefineObjectRelationship("object", Object)
+    DefineObjectRelationship("camera", Camera)
 
     while(!shouldKill) {
 

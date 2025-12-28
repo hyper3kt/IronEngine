@@ -69,10 +69,10 @@ namespace Iron {
 
 #define DefineObjectRelationship(name, value) { struct ObjectRelationship or_; \
 	or_.typeName = name; \
-	or_.creator = []() { return value; }; \
+	or_.creator = []() { return new value(); }; \
 	Engine::AddObjectRelationship(or_); }
 
 #define DefineCompRelationship(name, value) { struct ComponentRelationship cr; \
 	cr.typeName = name; \
-	cr.creator = []() { return value; }; \
+	cr.creator = []() { return new value(); }; \
 	Engine::AddCompRelationship(cr); }

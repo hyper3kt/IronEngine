@@ -125,6 +125,7 @@ Entry::operator std::vector<std::string>() {
 }
 
 Result<EngineResult> Config::LoadConfig(std::string path) {
+    configPath = path;
     FileSystem::Map fileMap = FileSystem::Map(path.c_str(), FileSystem::IRON_MAP_READ);
 
     if(!fileMap.Valid()) {
@@ -173,4 +174,55 @@ void Config::SetEntry(std::string name, std::vector<std::string> value) {
 
 bool Config::HasEntry(std::string name) {
     return utilFindEntryFromMap(&entries, name, false).Success();
+}
+
+std::string utilCreateStringRepresentation(Entry entry, std::string parentIds = "") {
+    std::string currentId = parentIds;
+
+    if(parentIds != "") {
+        currentId += ".";
+    }
+
+    currentId += entry.GetName();
+
+    std::string representation = currentId + ":";
+    int numEntries = entry.GetNumEntries();
+
+    if(numEntries == 1) {
+        representation += entry.String() + "\n";
+    } else {
+        representation += "\n";
+
+        for(int i = 0; i < numEntries; i++) {
+            representation += "- \"";
+            representation += entry.String(i).Value() + "\"\n";
+        }
+    }
+
+    for(int i = 0; i < entry.GetNumSubEntries(); i++) {
+        representation += utilCreateStringRepresentation(*entry.SubEntries().at(i), currentId);
+    }
+
+    return representation;
+}
+
+bool Config::SaveChanges() {
+    FileSystem::Map map = FileSystem::Map(configPath.c_str(), FileSystem::IRON_MAP_READWRITE);
+    
+    if(!map.Valid()) {
+        return false;
+    }
+
+    map.Erase();
+
+    unsigned int offset = 0;
+
+    for(auto iter = entries.begin(); iter != entries.end(); ++iter) {
+        std::string representation = utilCreateStringRepresentation(entries[iter->first]);
+        map.Write(representation.c_str(), representation.size(), offset);
+        offset += representation.size();
+    }
+
+    map.Close();
+    return true;
 }

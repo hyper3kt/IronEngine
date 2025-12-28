@@ -33,6 +33,8 @@ namespace Iron {
             bool Valid();
 
             char* Get();
+            void Write(const char* str, size_t strSize, unsigned int offset = 0);
+            void Erase();
 
             size_t GetCharsConsumed();
             Result<char> Consume();

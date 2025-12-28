@@ -14,6 +14,7 @@ namespace Iron {
     class IronDLL Config {
 
         boost::unordered_map<std::string, Entry> entries;
+        std::string configPath;
 
         public:
 
@@ -22,6 +23,7 @@ namespace Iron {
         void SetEntry(std::string name, std::string value);
         void SetEntry(std::string name, std::vector<std::string> value);
         bool HasEntry(std::string entry);
+        bool SaveChanges();
 
     };
 

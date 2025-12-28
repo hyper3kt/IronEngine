@@ -90,6 +90,22 @@ char* Map::Get() {
     return map;
 }
 
+void Map::Write(const char* str, size_t strSize, unsigned int offset) {
+    if(strSize + offset > fileSize) {
+        return;
+    }
+
+    for(int i = 0; i < strSize; i++) {
+        map[i + offset] = str[i];
+    }
+}
+
+void Map::Erase() {
+    for(int i = 0; i < fileSize; i++) {
+        map[i] = 0x0;
+    }
+}
+
 size_t Map::GetCharsConsumed() {
     return consumed;
 }
