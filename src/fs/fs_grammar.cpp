@@ -380,3 +380,8 @@ void Grammar::DefineSubBins(unsigned int bin, int numSubBins, BinExp subBins[]) 
     auto ptr = internalBins.at(id).bins.end();
     internalBins.at(id).bins.insert(ptr, subBins, subBins + numSubBins);
 }
+
+void Grammar::ResetGrammar() {
+    internalBins.clear();
+    internalElems.clear();
+}

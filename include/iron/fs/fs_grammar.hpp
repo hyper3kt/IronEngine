@@ -97,6 +97,7 @@ namespace Iron {
 
             void DefineBinElements(unsigned int bin, int numElems, ElemExp elems[]);
             void DefineSubBins(unsigned int bin, int numBins, BinExp subBins[]);
+            void ResetGrammar();
 
             std::vector<Bin> parsedBins;
 
