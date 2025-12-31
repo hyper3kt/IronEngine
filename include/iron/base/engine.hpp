@@ -7,6 +7,8 @@
 #include "iron/world/scene.hpp"
 #include "iron/macros.hpp"
 
+#include <boost/unordered_map.hpp>
+
 #include <iostream>
 #include <vector>
 #include <functional>
@@ -39,22 +41,25 @@ namespace Iron {
 		static bool loadedConfigs;
 		static bool useVulkan;
 
-		static std::vector<ObjectRelationship> objRelations;
-		static std::vector<ComponentRelationship> compRelations;
+		static boost::unordered_map<std::string, std::function<Object*()>> objRelations;
+		static boost::unordered_map<std::string, std::function<Component*()>> compRelations;
 
 		Engine();
+
+		static void Kill();
 
 		public:
 
 		static void Init();
 		static void Ignite();
-		static void Kill();
+		static void KillEngine();
+
 		static Result<EngineResult> LoadConfigs(std::string game, std::string settings);
 		
 		static void AddObjectRelationship(ObjectRelationship or_);
-		static std::vector<ObjectRelationship> GetObjectRelationships();
+		static Result<std::function<Object*()>> GetObjectRelationship(std::string name);
 		static void AddCompRelationship(ComponentRelationship cr);
-		static std::vector<ComponentRelationship> GetCompRelationships();
+		static Result<std::function<Component*()>> GetComponentRelationship(std::string name);
 		static Scene* GetScene();
 		static Result<EngineResult> LoadScene(const char* path);
 		static Result<EngineResult> LoadSceneFromState(const char* path, const char* savePath);
@@ -62,6 +67,7 @@ namespace Iron {
 		static std::string GetGameName();
 
 		static bool ShouldUseVulkan();
+		static bool ContinueRunning();
 
 	};
 

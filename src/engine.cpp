@@ -22,8 +22,8 @@ bool Engine::shouldKill = false;
 bool Engine::loadedConfigs = false;
 bool Engine::useVulkan = false;
 
-std::vector<ObjectRelationship> Engine::objRelations;
-std::vector<ComponentRelationship> Engine::compRelations;
+boost::unordered_map<std::string, std::function<Object*()>> Engine::objRelations;
+boost::unordered_map<std::string, std::function<Component*()>> Engine::compRelations;
 
 bool Engine::ShouldUseVulkan() {
     return useVulkan;
@@ -122,14 +122,42 @@ void Engine::Init() {
     }
 }
 
+float lastTickTime = 0.0f;
+float deltaTime = 0.0f;
+
+int TickScene(void* ptr) {
+    while(Engine::ContinueRunning()) {
+        float time = SDL_GetTicks();
+        deltaTime = time - lastTickTime;
+        lastTickTime = time;
+
+        Engine::GetScene()->Tick(deltaTime);
+    }
+}
+
+int FixedTickScene(void* ptr) {
+    while(Engine::ContinueRunning()) {
+        Engine::GetScene()->FixedTick();
+        SDL_Delay(20);
+    }
+}
+
 void Engine::Ignite() {
     DefineObjectRelationship("object", Object)
     DefineObjectRelationship("camera", Camera)
 
-    while(!shouldKill) {
+    SDL_Thread* tickScene = SDL_CreateThread(TickScene, "TickScene", (void*) NULL);
+    SDL_Thread* fixedTickScene = SDL_CreateThread(FixedTickScene, "FixedTickScene", (void*) NULL);
 
+    if(tickScene == NULL || fixedTickScene == NULL) {
+        Kill();
+        return;
     }
 
+    while(ContinueRunning()) {
+        renderer->Tick();
+    }
+    
     Kill();
 }
 
@@ -149,17 +177,33 @@ std::string Engine::GetGameName() {
 }
 
 void Engine::AddObjectRelationship(ObjectRelationship or_) {
-    objRelations.push_back(or_);
+    objRelations[or_.typeName] = or_.creator;
 }
 
-std::vector<ObjectRelationship> Engine::GetObjectRelationships() {
-    return objRelations;
+Result<std::function<Object*()>> Engine::GetObjectRelationship(std::string name) {
+    if(objRelations.contains(name)) {
+        return objRelations[name];
+    }
+
+    return Failure(IRON_RESULT_NONEXISTENT_REQUEST);
 }
 
 void Engine::AddCompRelationship(ComponentRelationship cr) {
-    compRelations.push_back(cr);
+    compRelations[cr.componentName] = cr.creator;
 }
 
-std::vector<ComponentRelationship> Engine::GetCompRelationships() {
-    return compRelations;
+Result<std::function<Component*()>> Engine::GetComponentRelationship(std::string name) {
+    if(compRelations.contains(name)) {
+        return compRelations[name];
+    }
+
+    return Failure(IRON_RESULT_NONEXISTENT_REQUEST);
+}
+
+bool Engine::ContinueRunning() {
+    return !shouldKill;
+}
+
+void Engine::KillEngine() {
+    shouldKill = true;
 }

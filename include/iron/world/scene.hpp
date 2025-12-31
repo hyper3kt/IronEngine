@@ -6,29 +6,43 @@
 #include <iostream>
 #include <vector>
 
+#define SCENE_NO_PREFERENCE 0
+
 namespace Iron {
+
+    struct ObjectWrapper {
+        Object* object = nullptr;
+        bool valid = false;
+    };
 
     class IronDLL Scene {
 
-        std::vector<Object*> objects;
+        std::vector<ObjectWrapper> objects;
+
+        void SetObjectId(int id, Object* object);
+        void UnsetObjectId(int id);
 
         public:
 
-        static bool HasScene(const char* path);
-        static Result<Scene*> LoadScene(const char* path);
+        Scene(std::string path, bool loadSave);
 
-        Result<Object*> GetObject(ObjectId id);
+        Result<Object*> GetObject(int id);
+        Result<Object*> GetObject(std::string name);
         std::vector<Object*> GetObjectsByName(std::string name);
         std::vector<Object*> GetObjectsByComponent(std::string componentName);
         std::vector<Object*> GetObjectsByType(std::string typeName);
-        
-        void AddObject(Object* object);
+
+        int AssignObjectId(Object* object, int preference = SCENE_NO_PREFERENCE);
+        int GetFirstUsableId();
+        bool IsIdAvailable(int id);
+        bool DoesIdExist(int id);
+
+        Result<Object*> AddObject(std::string typeName, std::string entityName);
         void RemoveObject(ObjectId id);
 
-        void Tick();
-        void Archive();
-        void FromState(const char* archivePath);
-        void BareLoad();
+        void Tick(float dt);
+        void FixedTick();
+        void Save();
         void Unload();
 
     };

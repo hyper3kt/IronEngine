@@ -7,8 +7,18 @@ Result<Object*> ObjectId::GetObject() {
     return object;
 }
 
+ObjectId::ObjectId(int fromId) {
+    object = Engine::GetScene()->GetObject(fromId);
+}
+
+ObjectId::ObjectId(std::string fromName) {
+    object = Engine::GetScene()->GetObject(fromName);
+}
+
 ObjectId::ObjectId(Object* fromPtr) {
-	object = fromPtr;
+    if(fromPtr != nullptr) {
+        object = fromPtr;
+    }
 }
 
 Object::Object() {
@@ -19,6 +29,19 @@ Object::Object(Archive* archive) {
     this->archive = archive;
 }
 
+Object::Object(ObjectId id) {
+    GetObjectFromId(id, parent);
+
+    SetParent(parent);
+}
+
+Object::Object(ObjectId id, Archive* archive) {
+    this->archive = archive;
+    
+    GetObjectFromId(id, parent);
+    SetParent(parent);
+}
+
 std::string Object::GetName() {
     return archive->GetName();
 }
@@ -27,13 +50,38 @@ void Object::SetName(std::string name) {
     archive->SetName(name);
 }
 
+int Object::GetId() {
+    return id;
+}
+
+// note that this function only updates what an object thinks its id is.
+void Object::SetId(int id) {
+    this->id = id;
+}
+
+bool Object::IsActive() {
+    return active;
+}
+
+void Object::SetActive(bool active) {
+    this->active = active;
+}
+
+Result<Object*> Object::GetParent() {
+    if(parent == nullptr) {
+        return Failure(IRON_RESULT_UNINITIALIZED);
+    }
+
+    return parent;
+}
+
 void Object::SetParent(ObjectId id) {
     Orphan();
     this->parent = parent;
 }
 
 void Object::AddChild(ObjectId id) {
-    DerefObjectId(id, child);
+    GetObjectFromId(id, child);
 
     for(int i = 0; children.size(); i++) {
         Object* obj = children.at(i);
@@ -55,7 +103,7 @@ void Object::AddChildren(std::vector<ObjectId> children) {
 }
 
 void Object::OrphanChild(ObjectId id) {
-    DerefObjectId(id, obj);
+    GetObjectFromId(id, obj);
 
     for(int i = 0; i < children.size(); i++) {
         Object* child = children.at(i);
@@ -75,7 +123,7 @@ void Object::Orphan() {
 }
 
 void Object::DeleteChild(ObjectId id) {
-    DerefObjectId(id, child);
+    GetObjectFromId(id, child);
 
     for(int i = 0; i < children.size(); i++) {
         Object* obj = children.at(i);
@@ -92,7 +140,7 @@ void Object::Delete() {
     for(int i = 0; i < children.size(); i++) {
         Object* child = children.at(i);
         archive->DetachArchive(child->GetName());
-        child->Delete();
+        Engine::GetScene()->RemoveObject(child->GetId());
     }
 
     archive->Clean();
@@ -111,3 +159,27 @@ Archive* Object::GetArchive() {
 void Object::Init() {}
 void Object::Tick(float dt) {}
 void Object::FixedTick() {}
+
+void Object::PreInit() {
+    for(int i = 0; i < children.size(); i++) {
+        children.at(i)->PreInit();
+    }
+
+    Init();
+}
+
+void Object::PreTick(float dt) {
+    for(int i = 0; i < children.size(); i++) {
+        children.at(i)->PreTick(dt);
+    }
+
+    Tick(dt);
+}
+
+void Object::PreFixedTick() {
+    for(int i = 0; i < children.size(); i++) {
+        children.at(i)->PreFixedTick();
+    }
+
+    FixedTick();
+}

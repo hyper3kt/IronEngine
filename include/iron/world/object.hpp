@@ -28,12 +28,13 @@ namespace Iron {
 
     class IronDLL Object {
 
-        Archive* archive = nullptr;
         std::vector<Component*> components;
         int id = 0;
+        bool active = true;
 
         protected:
 
+        Archive* archive = nullptr;
         std::vector<Object*> children;
         Object* parent = nullptr;
 
@@ -51,6 +52,11 @@ namespace Iron {
 
         std::string GetName();
         void SetName(std::string name);
+        int GetId();
+        void SetId(int id);
+        bool IsActive();
+        void SetActive(bool active);
+        Result<Object*> GetParent();
         void SetParent(ObjectId id);
         void AddChild(ObjectId id);
         void AddChildren(std::vector<ObjectId> children);
@@ -60,19 +66,21 @@ namespace Iron {
         void DeleteChild(ObjectId id);
         Archive* GetArchive();
 
+        void PreInit();
         virtual void Init();
+        void PreTick(float dt);
         virtual void Tick(float dt);
+        void PreFixedTick();
         virtual void FixedTick();
-
-        // TODO: refactor
-        static void DeclareObject(std::string typeName, Object* instance);
-    };
-
-    struct IronDLL ObjectRegistry {
-        std::string typeName;
-        Object* instance;
+        
     };
 
 }
 
-#define DerefObjectId(objId, result) auto getObj = objId.GetObject(); if(!getObj.Success()) return; auto result = getObj.Value()
+#define GetObjectFromId(objId, result) Object* result = nullptr; { auto getObj = objId.GetObject(); if(!getObj.Success()) return; result = getObj.Value(); }
+#define GetObjectFromIdWithError(objId, result, errorCode) Object* result = nullptr; \
+    { \
+        auto getObj = objId.GetObject(); \
+        if(!getObj.Success()) return Failure(errorCode); \
+        result = getObj.Value(); \
+    }
