@@ -9,8 +9,8 @@
 
 using namespace Iron;
 
-Scene* Engine::scene = new Scene();
-Renderer* Engine::renderer;
+Scene* Engine::scene = nullptr;
+Renderer* Engine::renderer = nullptr;
 
 Config Engine::gameConfig = Config();
 Config Engine::settingsConfig = Config();
@@ -133,6 +133,8 @@ int TickScene(void* ptr) {
 
         Engine::GetScene()->Tick(deltaTime);
     }
+
+    return 0;
 }
 
 int FixedTickScene(void* ptr) {
@@ -140,6 +142,8 @@ int FixedTickScene(void* ptr) {
         Engine::GetScene()->FixedTick();
         SDL_Delay(20);
     }
+
+    return 0;
 }
 
 void Engine::Ignite() {
