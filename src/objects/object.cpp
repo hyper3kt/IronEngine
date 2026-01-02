@@ -22,20 +22,27 @@ ObjectId::ObjectId(Object* fromPtr) {
 }
 
 Object::Object() {
-    archive = new Archive();
+    active = archive->RetrieveBool("active", true);
+    visible = archive->RetrieveBool("visible", true);
 }
 
 Object::Object(Archive* archive) {
     this->archive = archive;
+    active = archive->RetrieveBool("active", true);
+    visible = archive->RetrieveBool("visible", true);
 }
 
 Object::Object(ObjectId id) {
+    active = archive->RetrieveBool("active", true);
+    visible = archive->RetrieveBool("visible", true);
     GetObjectFromId(id, parent);
 
     SetParent(parent);
 }
 
 Object::Object(ObjectId id, Archive* archive) {
+    active = archive->RetrieveBool("active", true);
+    visible = archive->RetrieveBool("visible", true);
     this->archive = archive;
     
     GetObjectFromId(id, parent);
@@ -60,11 +67,19 @@ void Object::SetId(int id) {
 }
 
 bool Object::IsActive() {
-    return active;
+    return *active;
 }
 
 void Object::SetActive(bool active) {
-    this->active = active;
+    *(this->active) = active;
+}
+
+bool Object::IsVisible() {
+    return *visible;
+}
+
+void Object::SetVisible(bool visibility) {
+    *(this->visible) = visibility;
 }
 
 Result<Object*> Object::GetParent() {

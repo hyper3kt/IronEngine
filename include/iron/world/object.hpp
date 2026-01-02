@@ -30,11 +30,12 @@ namespace Iron {
 
         std::vector<Component*> components;
         int id = 0;
-        bool active = true;
+        BoolItem* active;
+        BoolItem* visible;
 
         protected:
 
-        Archive* archive = nullptr;
+        Archive* archive = new Archive();
         std::vector<Object*> children;
         Object* parent = nullptr;
 
@@ -56,6 +57,8 @@ namespace Iron {
         void SetId(int id);
         bool IsActive();
         void SetActive(bool active);
+        bool IsVisible();
+        void SetVisible(bool visibility);
         Result<Object*> GetParent();
         void SetParent(ObjectId id);
         void AddChild(ObjectId id);

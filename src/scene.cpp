@@ -56,6 +56,10 @@ Result<Object*> Scene::GetObject(std::string name) {
     return Failure(IRON_RESULT_NONEXISTENT_REQUEST);
 }
 
+std::vector<ObjectWrapper> Scene::GetObjects() {
+    return objects;
+}
+
 int Scene::AssignObjectId(Object* object, int preference) {
     if(preference == SCENE_NO_PREFERENCE) {
         int id = GetFirstUsableId();

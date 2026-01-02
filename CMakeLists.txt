@@ -35,6 +35,14 @@ else()
     message(FATAL_ERROR "Could not find GLM. Please either install GLM or run 'git submodule update --init --recursive' to install all submodules.")
 endif()
 
+if(EXISTS "${IRON_LIB_DIR}/assimp/CMakeLists.txt")
+    add_subdirectory("${IRON_LIB_DIR}/assimp" EXCLUDE_FROM_ALL)
+elseif(Assimp_FOUND)
+    message(STATUS "Found Assimp!")
+else()
+    message(FATAL_ERROR "Could not find Assimp. Please either install Assimp or run 'git submodule update --init --recursive' to install all submodules.")
+endif()
+
 find_package(Boost REQUIRED)
 
 file(GLOB_RECURSE IRON_SOURCE ${IRON_DIR}/src/*.cpp)
@@ -48,11 +56,13 @@ target_include_directories(IronEngine PRIVATE
     ${IRON_PRIVATE_HEADERS}
     ${Boost_INCLUDE_DIRS}
     ${SDL3_INCLUDE_DIRS}
+    ${IRON_LIB_DIR}/assimp/include
     ${IRON_LIB_DIR}/glad/include
 )
 target_link_libraries(IronEngine PRIVATE 
     Boost::boost
     SDL3::SDL3
+    assimp
 )
 if (USE_VULKAN)
     target_include_directories(IronEngine PRIVATE ${Vulkan_INCLUDE_DIRS})

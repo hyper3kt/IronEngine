@@ -10,7 +10,7 @@
 
 namespace Iron {
 
-    struct ObjectWrapper {
+    struct IronDLL ObjectWrapper {
         Object* object = nullptr;
         bool valid = false;
     };
@@ -31,6 +31,7 @@ namespace Iron {
         std::vector<Object*> GetObjectsByName(std::string name);
         std::vector<Object*> GetObjectsByComponent(std::string componentName);
         std::vector<Object*> GetObjectsByType(std::string typeName);
+        std::vector<ObjectWrapper> GetObjects();
 
         int AssignObjectId(Object* object, int preference = SCENE_NO_PREFERENCE);
         int GetFirstUsableId();
