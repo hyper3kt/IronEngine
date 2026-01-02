@@ -93,7 +93,8 @@ Result<Bin> Grammar::ReadBin() {
         return Failure(IRON_RESULT_IMPROPER_FORMAT);
     }
 
-    int id = GetSequentialId(getBinType.Value(), false);
+    auto binType = getBinType.Value();
+    int id = GetSequentialId(binType, false);
 
     if(id == GRAMMAR_NO_ID) {
         std::string err = "Got undefined id: ";
@@ -102,9 +103,9 @@ Result<Bin> Grammar::ReadBin() {
     }
 
     Bin bin;
-    bin.type = id;
+    bin.type = binType;
 
-    while(map->Peek().Success() && map->Peek().Value() != id) {
+    while(map->Peek().Success() && map->Peek().Value() != binType) {
         auto peekType = PeekType(id);
 
         if(peekType == GRAMMAR_INV) {
@@ -142,9 +143,9 @@ Result<Element> Grammar::ReadElement(int bin) {
         return Failure(IRON_RESULT_FAILED);
     }
 
-    int id = GetElementId(getChar.Value(), false);
+    auto elemType = getChar.Value();
 
-    if(id == GRAMMAR_NO_ID) {
+    if(GetElementId(elemType, false) == GRAMMAR_NO_ID) {
         return Failure(IRON_RESULT_IMPROPER_FORMAT);
     }
 
@@ -153,7 +154,7 @@ Result<Element> Grammar::ReadElement(int bin) {
     bool foundRule = false;
 
     for(int i = 0; i < binElems.size(); i++) {
-        if(binElems.at(i).type == id) {
+        if(binElems.at(i).type == elemType) {
             rule = binElems.at(i);
             foundRule = true;
         }
@@ -258,14 +259,14 @@ Grammar::ApparentID Grammar::PeekType(unsigned int bin) {
         return GRAMMAR_INV;
     }
 
-    char c = getChar.Value();
+    auto c = getChar.Value();
     int id = GetSequentialId(c, false);
 
     if(id != GRAMMAR_NO_ID) {
         auto bins = internalBins.at(id).bins;
 
         for(int i = 0; i < bins.size(); i++) {
-            if(bins.at(i).binType == id) {
+            if(bins.at(i).binType == c) {
                 return GRAMMAR_BIN;
             }
         }

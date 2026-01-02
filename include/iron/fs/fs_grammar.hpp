@@ -30,7 +30,7 @@ namespace Iron {
             std::vector<struct _ElemExp> composition;
         } ElemExp;
 
-        typedef struct IronDLL _BinExp{
+        typedef struct IronDLL _BinExp {
             unsigned int binType;
         } BinExp;
 
