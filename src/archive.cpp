@@ -219,13 +219,7 @@ NumberItem::NumberItem(Archive* owner, double def) {
 }
 
 void NumberItem::Pass(std::vector<char> bytes) {
-    long replica = value;
-
-    for(int i = 0; i < bytes.size(); i++) {
-        replica += bytes.at(i) << 8 * i;
-    }
-
-    value = replica;
+    memcpy(&value, bytes.data(), sizeof(double));
 }
 
 NumberItem& NumberItem::operator=(double rhs) {
