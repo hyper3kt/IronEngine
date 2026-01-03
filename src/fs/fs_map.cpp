@@ -7,6 +7,20 @@
 
 #ifdef Windows
 #include <Windows.h>
+
+struct DDWord {
+    // least significant byte
+    DWORD low;
+    // most significant byte
+    DWORD high;
+};
+
+DDWord utilSizeToDDWord(size_t size) {
+    DDWord word;
+    word.high = (DWORD)((0xffffffff00000000 & size) >> 32);
+    word.low = (DWORD)(0x00000000ffffffff & size);
+    return word;
+}
 #endif
 
 using namespace Iron;
@@ -14,7 +28,7 @@ using namespace FileSystem;
 
 // https://stackoverflow.com/questions/68368291/mapping-files-into-virtual-memory-in-c-on-windows
 
-Map::Map(const char* path, MapPermissions perms) {
+Map::Map(const char* path, MapPermissions perms, size_t numBytesToMap, size_t offset) {
     this->perms = perms;
     #ifdef Windows
     DWORD creationDesiredAccess = perms == IRON_MAP_READ ? GENERIC_READ : GENERIC_WRITE;
@@ -25,30 +39,36 @@ Map::Map(const char* path, MapPermissions perms) {
         return;
     }
 
-    LARGE_INTEGER getFileSize;
+    if(numBytesToMap == MAP_LOAD_WHOLE_FILE) {
+        LARGE_INTEGER getFileSize;
 
-    if(!GetFileSizeEx(fileHandle, &getFileSize)) {
-        Close();
-        return;
+        if(!GetFileSizeEx(fileHandle, &getFileSize)) {
+            Close();
+            return;
+        }
+
+        mapSize = (size_t) getFileSize.QuadPart;
+
+        if(mapSize == 0) {
+            Close();
+            return;
+        }
+    } else {
+        mapSize = numBytesToMap;
     }
 
-    fileSize = (size_t) getFileSize.QuadPart;
-
-    if(fileSize == 0) {
-        Close();
-        return;
-    }
-
-    DWORD protect = perms == IRON_MAP_READ ? PAGE_READONLY : PAGE_READWRITE;
-    mapHandle = CreateFileMapping(fileHandle, NULL, protect, 0, 0, NULL);
+    DDWord dwNumBytesToMap = utilSizeToDDWord(numBytesToMap);
+    DWORD permissions = perms == IRON_MAP_READ ? PAGE_READONLY : PAGE_READWRITE;
+    mapHandle = CreateFileMapping(fileHandle, NULL, permissions, dwNumBytesToMap.high, dwNumBytesToMap.low, NULL);
 
     if(mapHandle == NULL) {
         Close();
         return;
     }
 
+    DDWord dwOffset = utilSizeToDDWord(offset);
     DWORD mapDesiredAccess = perms == IRON_MAP_READ ? FILE_MAP_READ : FILE_MAP_WRITE;
-    LPVOID view = MapViewOfFile(mapHandle, mapDesiredAccess, 0, 0, 0);
+    LPVOID view = MapViewOfFile(mapHandle, mapDesiredAccess, dwOffset.high, dwOffset.low, dwNumBytesToMap.low);
 
     if(view == NULL) {
         Close();
@@ -83,7 +103,7 @@ bool Map::Valid() {
 // https://stackoverflow.com/questions/238603/how-can-i-get-a-files-size-in-c
 
 size_t Map::Size() {
-    return fileSize;
+    return mapSize;
 }
 
 char* Map::Get() {
@@ -91,7 +111,7 @@ char* Map::Get() {
 }
 
 void Map::Write(const char* str, size_t strSize, unsigned int offset) {
-    if(strSize + offset > fileSize) {
+    if(strSize + offset > mapSize) {
         return;
     }
 
@@ -101,7 +121,7 @@ void Map::Write(const char* str, size_t strSize, unsigned int offset) {
 }
 
 void Map::Erase() {
-    for(int i = 0; i < fileSize; i++) {
+    for(int i = 0; i < mapSize; i++) {
         map[i] = 0x0;
     }
 }

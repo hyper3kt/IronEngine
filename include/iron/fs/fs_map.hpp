@@ -5,6 +5,9 @@
 
 #include <iostream>
 
+#define MAP_LOAD_WHOLE_FILE 0
+#define MAP_NO_FILE_OFFSET 0
+
 namespace Iron {
 
     namespace FileSystem {
@@ -20,13 +23,13 @@ namespace Iron {
             void* fileHandle = nullptr;
             void* mapHandle = nullptr;
             MapPermissions perms;
-            size_t fileSize;
+            size_t mapSize;
             size_t consumed = 0;
             bool valid = false;
 
             public:
 
-            Map(const char* path, MapPermissions perms);
+            Map(const char* path, MapPermissions perms, size_t numBytesToMap = MAP_LOAD_WHOLE_FILE, size_t offset = MAP_NO_FILE_OFFSET);
 
             void Close();
             size_t Size();
